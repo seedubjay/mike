@@ -1,26 +1,34 @@
 import React from 'react';
 
 import SplitPane, { Pane } from 'react-split-pane';
-import { Slider } from '@material-ui/core';
+import { Slider, makeStyles } from '@material-ui/core';
 import './App.css';
 
-import Map from './Map';
-import ControlPanel from './ControlPanel';
+import MapView from './MapView';
+import ControlView from './ControlView';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+  },
+  leftPane: {
+    width:"80%",
+    margin: "auto",
+    backgroundColor: "white",
+  },
+  rightPane: {
+    width:"20%",
+    backgroundColor: "lightgray",
+  },
+}));
 
 function App() {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <SplitPane split="horizontal" defaultSize="50%">
-        <Pane
-          className="App-Pane-top"
-          defaultSize="50%">
-          <ControlPanel/>
-        </Pane>
-        <Pane
-          className="App-Pane-bottom"
-          defaultSize="50%">
-          <Map/>
-        </Pane>
+    <div className={classes.root}>
+      <SplitPane split="vertical" defaultSize="80%">
+        <MapView/>
+        <ControlView/>
       </SplitPane>
     </div>
   );
