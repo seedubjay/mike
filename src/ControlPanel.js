@@ -3,11 +3,11 @@ import { Slider, makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
+    backgroundColor: "white",
+  },
+  slider: {
     width: 300,
     margin: "auto",
-  },
-  margin: {
-    height: theme.spacing(3),
   },
 }));
 
@@ -34,11 +34,11 @@ function SliderInput({className}) {
 function ControlPanel() {
   const classes = useStyles();
   return (
-    <div className="ControlPanel">
-      <SliderInput className={classes.root}/>
-      <SliderInput className={classes.root}/>
-      <SliderInput className={classes.root}/>
-      <SliderInput className={classes.root}/>
+    <div className={classes.root}>
+      <SliderInput className={classes.slider}/>
+      <SliderInput className={classes.slider}/>
+      <SliderInput className={classes.slider}/>
+      <SliderInput className={classes.slider}/>
     </div>
   );
 }

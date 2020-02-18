@@ -1,11 +1,22 @@
 import React from 'react';
+import {makeStyles} from '@material-ui/core';
 import shape from './Somalia_regions_map.svg';
-import './Map.css';
+
+const useStyles = makeStyles(theme => ({
+  mapShape: {
+    height: "40vmin",
+  },
+  map: {
+    backgroundColor: "lightgray",
+  },
+}));
 
 function Map() {
+  const classes = useStyles();
+
   return (
-    <div className="Map">
-      <img src={shape} className="Map-shape" alt="map"/>
+    <div className={classes.map}>
+      <img src={shape} className={classes.mapShape} alt="map"/>
     </div>
   );
 }
