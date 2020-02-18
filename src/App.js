@@ -1,24 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
+
+import SplitPane, { Pane } from 'react-split-pane';
+import { Slider } from '@material-ui/core';
 import './App.css';
+
+import Map from './Map';
+import ControlPanel from './ControlPanel';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SplitPane split="horizontal" defaultSize="50%">
+        <Pane
+          className="App-Pane-top"
+          defaultSize="50%">
+          <ControlPanel/>
+        </Pane>
+        <Pane
+          className="App-Pane-bottom"
+          defaultSize="50%">
+          <Map/>
+        </Pane>
+      </SplitPane>
     </div>
   );
 }
