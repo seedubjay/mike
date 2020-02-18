@@ -11,9 +11,11 @@ const useStyles = makeStyles(theme => ({
   },
   settingsBox: {
     backgroundColor: "white",
+    marginBottom: 10,
   },
   slider: {
-    width: "100%",
+    paddingLeft: 5,
+    paddingRight: 5,
   },
 }));
 
@@ -29,15 +31,17 @@ function SliderInput() {
         <p>
           hello
         </p>
-        <Slider
-          defaultValue={30}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={10}
-          marks
-          min={10}
-          max={110}
-        />
+        <div className={classes.slider}>
+          <Slider
+            defaultValue={30}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            step={10}
+            marks
+            min={10}
+            max={110}
+          />
+        </div>
       </div>
     </div>
   )
