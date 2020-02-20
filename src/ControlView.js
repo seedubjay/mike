@@ -105,68 +105,23 @@ function GraphInput() {
 
   // creates a row of vertical sliders
   function VerticalSliders() {
+    const sliders = [];
+    for(let i=0; i<6; i++){
+      sliders.push(<Grid item xs={2}>
+        <Paper className={classes.paper}>
+          <PrettoSlider
+            orientation="vertical"
+            valueLabelDisplay="on"
+            aria-label="pretto slider"
+            defaultValue={20}
+          />
+        </Paper>
+      </Grid>)
+    }
+    
     return (
       <React.Fragment>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="on"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.paper}>
-            <PrettoSlider
-              orientation="vertical"
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={20}
-            />
-          </Paper>
-        </Grid>
+        {sliders}
       </React.Fragment>
     );
   }
