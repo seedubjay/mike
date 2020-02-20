@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import somaliaRegions from './regions.js';
+import somaliaRegions from './regions.json';
 
 const useStyles = makeStyles(theme => ({
   mapBox: {
@@ -26,19 +26,26 @@ const regionAnimation = {
 }
 
 function RegionHighlight({key, regionName}) {
-  const x = useSpring(0, {stiffness: 400});
+  const x = useMotionValue(0);
   const c = useTransform(x, [0,1], ["rgb(200,200,200)", "rgb(150,255,150)"]);
   const s = useTransform(x, [0,1], [1, 1.1]);
-  const o = useTransform(x, i => i < 0.5 ? 0 : 1);
+  const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
+      style={{ x }}
       fill={c}
       scale={s}
       opacity={o}
-      onHoverStart={() => {console.log("hover start");x.set(1);}}
-      onHoverEnd={() => {console.log("hover end"); x.set(0);}}
+      initial={{
+        x:0,
+        transition: {duration: 0},
+      }}
+      whileHover={{
+        x:1,
+        transition: {duration: 0.1}
+      }}
       />
   )
 }
@@ -60,6 +67,8 @@ function MapView({}) {
                 key={i}
                 d={somaliaRegions[regionName]}
                 fill="rgb(200, 200, 200)"
+                stroke="white"
+                strokeWidth={3}
                 />
             ))
           }
