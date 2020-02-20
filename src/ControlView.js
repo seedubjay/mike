@@ -98,7 +98,6 @@ const useBarGraphStyles = makeStyles(theme => ({
   }
 }));
 
-// TODO: combine repeated code into loops
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
 function GraphInput() {
   const classes = useBarGraphStyles();
@@ -111,7 +110,7 @@ function GraphInput() {
         <Paper className={classes.paper}>
           <PrettoSlider
             orientation="vertical"
-            valueLabelDisplay="on"
+            valueLabelDisplay="auto"
             aria-label="pretto slider"
             defaultValue={20}
           />
