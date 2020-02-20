@@ -27,12 +27,18 @@ function App() {
 
   return (
     <div className={classes.root}>
+<<<<<<< HEAD
       <SplitPane split="vertical" defaultSize="76%">
         <SplitPane split="horizontal" defaultSize="60%">
           <MapView/>
           <AnalysisView/>
         </SplitPane>
         <ControlView/>
+=======
+      <SplitPane split="vertical" defaultSize="80%">
+        <MapView/>
+        <ControlView region="Somalia"/>
+>>>>>>> 90aab905b93be64a1cb58f26221cd4119c587b2a
       </SplitPane>
     </div>
   );
