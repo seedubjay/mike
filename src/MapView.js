@@ -25,10 +25,22 @@ const regionAnimation = {
   }
 }
 
+function RegionBackground({key, regionName}) {
+  return (
+    <motion.path
+      key={key}
+      d={somaliaRegions[regionName]}
+      fill="rgb(200,200,200)"
+      stroke="white"
+      strokeWidth={2}
+      />
+  )
+}
+
 function RegionHighlight({key, regionName}) {
   const x = useMotionValue(0);
   const c = useTransform(x, [0,1], ["rgb(200,200,200)", "rgb(150,255,150)"]);
-  const s = useTransform(x, [0,1], [1, 1.1]);
+  const s = useTransform(x, [0,1], [1, 1.2]);
   const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
     <motion.path
@@ -36,6 +48,8 @@ function RegionHighlight({key, regionName}) {
       d={somaliaRegions[regionName]}
       style={{ x }}
       fill={c}
+      stroke="white"
+      strokeWidth={0}
       scale={s}
       opacity={o}
       initial={{
@@ -63,13 +77,7 @@ function MapView({}) {
           viewBox="0 0 1051.004 1338">
           {
             Object.keys(somaliaRegions).sort((a,b) => (a === hover) === (b === hover) ? 0 : ((a === hover) ? 1:-1)).map((regionName, i) => (
-              <motion.path
-                key={i}
-                d={somaliaRegions[regionName]}
-                fill="rgb(200, 200, 200)"
-                stroke="white"
-                strokeWidth={3}
-                />
+              <RegionBackground key={i} regionName={regionName}/>
             ))
           }
           {
