@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Slider, makeStyles } from '@material-ui/core';
+import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -7,6 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { getThemeProps } from '@material-ui/styles';
 import { inheritInnerComments } from '@babel/types';
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -36,8 +38,132 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function GraphInput() {
+// used as vertical slider
+const PrettoSlider = withStyles({
+  root: {
+    color: "#52af77",
+    height: 8,
+    width: 8
+  },
+  thumb: {
+    height: 12,
+    width: 12,
+    backgroundColor: "#fff",
+    border: "2px solid currentColor",
+    marginTop: -8,
+    marginLeft: -12,
+    "&:focus,&:hover,&$active": {
+      boxShadow: "inherit"
+    },
+    left: 13 //"calc(45%)"
+  },
+  active: {},
+  valueLabel: {
+    left: "calc(-150%)" //"calc(-50% + 4px)"
+  },
+  track: {
+    height: 80,
+    width: 50,
+    borderRadius: 40
+  },
+  rail: {
+    height: 80,
+    width: 50,
+    borderRadius: 40
+  }
+})(Slider);
 
+// style for the vertical sliders
+const useBarGraphStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1
+  },
+  paper: {
+    padding: theme.spacing(1),
+    textAlign: "center",
+    color: theme.palette.text.secondary,
+    height: "120%",
+    width:"100/6%",
+    backgroundColor: 'transparent',
+    boxShadow: 'none'
+  },
+  label: {
+    padding: theme.spacing(1),
+    textAlign: "center",
+    color: theme.palette.text.secondary,
+    height: "50%",
+    width:"100/6%",
+    backgroundColor: 'transparent',
+    boxShadow: 'none'
+  }
+}));
+
+// TODO: combine repeated code into loops
+// creates vertical sliders with labels (e.g. for adjusting rainfall)
+function GraphInput() {
+  const classes = useBarGraphStyles();
+
+  // creates a row of vertical sliders
+  function VerticalSliders() {
+    const sliders = [];
+    for(let i=0; i<6; i++){
+      sliders.push(<Grid item xs={2}>
+        <Paper className={classes.paper}>
+          <PrettoSlider
+            orientation="vertical"
+            valueLabelDisplay="on"
+            aria-label="pretto slider"
+            defaultValue={20}
+          />
+        </Paper>
+      </Grid>)
+    }
+    
+    return (
+      <React.Fragment>
+        {sliders}
+      </React.Fragment>
+    );
+  }
+
+  // create row of labels for the vertical sliders
+  function VerticalSliderLabels() {
+    return (
+      <React.Fragment>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>Jan</Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>Feb</Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>Mar</Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>Apr</Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>May</Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.label}>Jun</Paper>
+        </Grid>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div className={classes.root}>
+      <Grid container spacing={1}>
+        <Grid container item xs={12} spacing={0}>
+          <VerticalSliders />
+        </Grid>
+        <Grid container item xs={12} spacing={0}>
+          <VerticalSliderLabels />
+        </Grid>
+      </Grid>
+    </div>
+  );
 }
 
 function Dataset(props) {
@@ -51,7 +177,8 @@ function Dataset(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
-            <SliderInput></SliderInput>
+            <GraphInput></GraphInput>
+            {/* <SliderInput></SliderInput> */}
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -85,7 +212,9 @@ function ControlView() {
           <Dataset backgroundColor="lightgreen" name="Food Prices"/>
           <Dataset backgroundColor="orange" name="Food Availability"/>
           <Dataset backgroundColor="lightblue" name="Rainfall"/>
+          <Dataset backgroundColor="red" name="Pasture Availability"/>          <Dataset backgroundColor="red" name="Pasture Availability"/>
           <Dataset backgroundColor="red" name="Pasture Availability"/>
+
       </div>
     </div>
   );
