@@ -204,20 +204,43 @@ function SliderInput() {
   )
 }
 
-function ControlView() {
-  const classes = useStyles();
-  return (
-    <div className={classes.root}>
-      <div className={classes.settingsList}>
-          <Dataset backgroundColor="lightgreen" name="Food Prices"/>
-          <Dataset backgroundColor="orange" name="Food Availability"/>
-          <Dataset backgroundColor="lightblue" name="Rainfall"/>
-          <Dataset backgroundColor="red" name="Pasture Availability"/>          <Dataset backgroundColor="red" name="Pasture Availability"/>
-          <Dataset backgroundColor="red" name="Pasture Availability"/>
+function ControlViewForRegion(props) {
+    const classes = useStyles();
+    return (
+      <div className={classes.root}>
+        <div className={classes.settingsList}>
+            <Dataset backgroundColor="lightgreen" name={props.region+" - Price of AAAAA"}/>
+            <Dataset backgroundColor="orange" name={props.region+" - Price of BBBBB"}/>
+            <Dataset backgroundColor="lightblue" name={props.region+" - Price of CCCCC"}/>
+            <Dataset backgroundColor="yellow" name={props.region+" - Price of DDDDD"}/>
+            <Dataset backgroundColor="red" name={props.region+" - Fatalities"}/>
 
+        </div>
       </div>
-    </div>
-  );
+    );
+    
+}
+
+function ControlView(props) {
+  const classes = useStyles();
+  if (props.region == "Somalia") {
+      return (
+        <div className={classes.root}>
+          <div className={classes.settingsList}>
+              <Dataset backgroundColor="lightgreen" name="Food Prices"/>
+              <Dataset backgroundColor="orange" name="Food Availability"/>
+              <Dataset backgroundColor="lightblue" name="Rainfall"/>
+              <Dataset backgroundColor="red" name="Pasture Availability"/>          
+              <Dataset backgroundColor="red" name="Pasture Availability"/>
+              <Dataset backgroundColor="red" name="Pasture Availability"/>
+
+          </div>
+        </div>
+      );
+  } else {
+      return ControlViewForRegion(props);
+  }
+  
 }
 
 export default ControlView;

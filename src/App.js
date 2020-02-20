@@ -28,7 +28,7 @@ function App() {
     <div className={classes.root}>
       <SplitPane split="vertical" defaultSize="80%">
         <MapView/>
-        <ControlView/>
+        <ControlView region="Somalia"/>
       </SplitPane>
     </div>
   );
