@@ -36,48 +36,6 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 5,
     paddingRight: 5,
   },
-}));
-
-// used as vertical slider
-const PrettoSlider = withStyles({
-  root: {
-    color: "#52af77",
-    height: 8,
-    width: 8
-  },
-  thumb: {
-    height: 12,
-    width: 12,
-    backgroundColor: "#fff",
-    border: "2px solid currentColor",
-    marginTop: -8,
-    marginLeft: -12,
-    "&:focus,&:hover,&$active": {
-      boxShadow: "inherit"
-    },
-    left: 13 //"calc(45%)"
-  },
-  active: {},
-  valueLabel: {
-    left: "calc(-150%)" //"calc(-50% + 4px)"
-  },
-  track: {
-    height: 80,
-    width: 50,
-    borderRadius: 40
-  },
-  rail: {
-    height: 80,
-    width: 50,
-    borderRadius: 40
-  }
-})(Slider);
-
-// style for the vertical sliders
-const useBarGraphStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1
-  },
   paper: {
     padding: theme.spacing(1),
     textAlign: "center",
@@ -91,16 +49,68 @@ const useBarGraphStyles = makeStyles(theme => ({
     padding: theme.spacing(1),
     textAlign: "center",
     color: theme.palette.text.secondary,
-    height: "50%",
+    height: "20%",
     width:"100/6%",
     backgroundColor: 'transparent',
     boxShadow: 'none'
-  }
+  },
 }));
+
+// used as vertical bar graph slider
+const BarGraphSlider = withStyles({
+  root: {
+    color: "#52af77",
+    height: 8,
+    width: 8
+  },
+  thumb: {
+    height: 20,
+    width: 20,
+    backgroundColor: "transparent",
+    marginTop: -8,
+    marginLeft: -12,
+    "&:focus,&:hover,&$active": {
+      boxShadow: "inherit"
+    },
+    "& .bar": {
+      // display: inline-block !important;
+      height: 1,
+      width: 9,
+      left: 15,
+      backgroundColor:"#fff",
+      marginLeft: 1,
+      marginRight: 1,
+      marginTop:15
+    },
+  },
+  vertical:{
+    width:13,
+  },
+  active: {},
+  valueLabel: {},
+  track: {
+    '$vertical &':{
+      width:13,
+    }
+  },
+  rail: {
+    '$vertical &':{
+      width:13,
+    }
+  }
+})(Slider);
+
+function SliderThumbComponents(props) {
+  return (
+    <span {...props}>
+      <span className="bar" />
+    </span>
+  );
+}
 
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
 function GraphInput() {
-  const classes = useBarGraphStyles();
+  const classes = useStyles();
 
   // creates a row of vertical sliders
   function VerticalSliders() {
@@ -108,10 +118,11 @@ function GraphInput() {
     for(let i=0; i<6; i++){
       sliders.push(<Grid item xs={2}>
         <Paper className={classes.paper}>
-          <PrettoSlider
+          <BarGraphSlider
+            ThumbComponent={SliderThumbComponents}
             orientation="vertical"
             valueLabelDisplay="auto"
-            aria-label="pretto slider"
+            aria-label="bar graph slider"
             defaultValue={20}
           />
         </Paper>
