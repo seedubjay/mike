@@ -33,7 +33,7 @@ function App() {
           <MapView/>
           <AnalysisView/>
         </SplitPane>
-        <SplitPane split="horizontal" defaultSize={150} primary="second">
+        <SplitPane split="horizontal" defaultSize="85%">
           <ControlView region="Somalia"/>
           <RecalculateView/>
         </SplitPane>
