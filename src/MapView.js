@@ -3,8 +3,6 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
 
-import MapDetailDrawer from './MapDetailDrawer';
-
 const useStyles = makeStyles(theme => ({
   root: {
     width: "100%",
