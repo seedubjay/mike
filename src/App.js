@@ -30,7 +30,7 @@ function App() {
     <div className={classes.root}>
       <SplitPane split="vertical" defaultSize={350} primary="second">
         <MapView/>
-        <SplitPane split="horizontal" defaultSize={150} primary="second">
+        <SplitPane split="horizontal" defaultSize="85%">
           <ControlView region="Somalia"/>
           <RecalculateView/>
         </SplitPane>
