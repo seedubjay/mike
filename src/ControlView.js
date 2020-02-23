@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
   settingsList: {
     padding: 10,
     overflow: 'auto',
-    height: 600,
+    height: "100%",
   },
   outerSettingsBox: {
     marginTop: 15,
