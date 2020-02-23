@@ -10,6 +10,8 @@ import { inheritInnerComments } from '@babel/types';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
+const BAR_WIDTH = 20;
+
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: "#F2F2F2",
@@ -28,56 +30,67 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   innerSettingsBox: {
+    height:190,
     backgroundColor: "#FAFAFA",
     width: 'max-width',
     flexGrow: 100,
   },
   slider: {
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingLeft: 1,
+    paddingRight: 1,
   },
   paper: {
     padding: theme.spacing(1),
     textAlign: "center",
     color: theme.palette.text.secondary,
-    height: "120%",
-    width:"100/6%",
+    height: "60%",
+    width:{BAR_WIDTH},
     backgroundColor: 'transparent',
     boxShadow: 'none'
   },
   label: {
     padding: theme.spacing(1),
-    textAlign: "right",//"center",
+    textAlign: "right",
     color: theme.palette.text.secondary,
-    height: "20%",
-    width:"100/6%",
+    height: "5%",
+    width:{BAR_WIDTH},
     backgroundColor: 'transparent',
     boxShadow: 'none',
-    fontSize:12,
+    fontSize:11,
   },
 }));
+
 
 // used as vertical bar graph slider
 const BarGraphSlider = withStyles({
   root: {
-    color: "#52af77",
+    color: "currentColor",
     height: 8,
-    width: 8
+    width: 8,
+    // TODO: do something when hovering over the bar graph
+    // good with detecting hovering, but can't find a way to change the ui that is graphically appealing
+    "&$focusVisible,&:hover":{
+      // borderColor:'black',
+      // borderRadius:3,
+      // backgroundColor:"#000000",
+      // color:"#000000",
+      // boxShadow: "inherit"
+      // border: `1px solid ${theme.palette.divider}`,
+    },
   },
   thumb: {
-    height: 20,
-    width: 20,
+    height: {BAR_WIDTH},
+    width: {BAR_WIDTH},
     backgroundColor: "transparent",
-    marginTop: -8,
-    marginLeft: -12,
+    left: 20, // cannot use BAR_WIDTH
+    // marginTop: -8,
+    // marginLeft: -12,
     "&:focus,&:hover,&$active": {
       boxShadow: "inherit"
     },
     "& .bar": {
-      // display: inline-block !important;
       height: 1,
       width: 9,
-      left: 15,
       backgroundColor:"#fff",
       marginLeft: 1,
       marginRight: 1,
@@ -85,18 +98,23 @@ const BarGraphSlider = withStyles({
     },
   },
   vertical:{
-    width:13,
+    width:{BAR_WIDTH},
   },
   active: {},
   valueLabel: {},
   track: {
     '$vertical &':{
-      width:13,
+      width:17,
+      // change color to black when hovering
+      // TODO: fix this, doesn't work all the time
+      "&$focusVisible,&:hover":{
+        backgroundColor:"#000000",
+      }
     }
   },
   rail: {
     '$vertical &':{
-      width:13,
+      width:17,
     }
   }
 })(Slider);
@@ -110,67 +128,56 @@ function SliderThumbComponents(props) {
 }
 
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
-function GraphInput() {
+function GraphInput(props){
   const classes = useStyles();
+  let dataMap = props.dataMap;
+  const graphs = [];
+  let i = 0;
 
-  // creates a row of vertical sliders
-  function VerticalSliders() {
-    const sliders = [];
-    for(let i=0; i<6; i++){
-      sliders.push(<Grid item xs={2}>
-        <Paper className={classes.paper}>
-          <BarGraphSlider
-            ThumbComponent={SliderThumbComponents}
-            orientation="vertical"
-            valueLabelDisplay="auto"
-            aria-label="bar graph slider"
-            defaultValue={20}
-          />
-        </Paper>
-      </Grid>)
+  dataMap.forEach((datapoint, label)=>{
+    if(i>(dataMap.size-6)-1){
+      graphs.push(
+        <div>
+            <Paper className={classes.paper}>
+              <BarGraphSlider
+                ThumbComponent={SliderThumbComponents}
+                orientation="vertical"
+                valueLabelDisplay="auto"
+                aria-label="bar graph slider"
+                defaultValue={datapoint}
+                style={{"color":props.color}} //style={{"color":{color}}} doesn't work
+              />
+            </Paper>
+            <Paper className={classes.label}>{label}</Paper>          
+          </div>
+      )
     }
-    
-    return (
-      <React.Fragment>
-        {sliders}
-      </React.Fragment>
-    );
-  }
+    else {
+      graphs.push(
+        <div>
+            <Paper className={classes.paper}>
+              <BarGraphSlider
+                ThumbComponent={SliderThumbComponents}
+                orientation="vertical"
+                valueLabelDisplay="auto"
+                aria-label="bar graph slider"
+                defaultValue={datapoint}
+                style={{"color":"grey"}} //style={{"color":{color}}} doesn't work
+              />
+            </Paper>
+            <Paper className={classes.label}>{label}</Paper>
+          </div>
+      )
+    }
+    i++;
+  });
 
-  // create row of labels for the vertical sliders
-  function VerticalSliderLabels() {
-    return (
-      <React.Fragment>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>Jan</Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>Feb</Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>Mar</Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>Apr</Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>May</Paper>
-        </Grid>
-        <Grid item xs={2}>
-          <Paper className={classes.label}>Jun</Paper>
-        </Grid>
-      </React.Fragment>
-    );
-  }
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={1}>
+      <Grid container spacing={5}>
         <Grid container item xs={12} spacing={0}>
-          <VerticalSliders />
-        </Grid>
-        <Grid container item xs={12} spacing={0}>
-          <VerticalSliderLabels />
+          {graphs}
         </Grid>
       </Grid>
     </div>
@@ -179,6 +186,23 @@ function GraphInput() {
 
 function Dataset(props) {
   const classes = useStyles();
+
+  // test values for bar graphs
+  let dataMap = new Map([
+    ["Feb", 10],
+    ["Mar", 99],
+    ["Apr", 52],
+    ["May", 53],
+    ["Jun", 58],
+    ["Jul", 58],
+    ["Aug", 58],
+    ["Sep", 58],
+    ["Oct", 58],
+    ["Nov", 58],
+    ["Dec", 58],
+    ["Jan", 20],
+  ]);
+
   return (
       <ExpansionPanel className={classes.outerSettingsBox} style={{backgroundColor: props.backgroundColor}}>
         <ExpansionPanelSummary
@@ -188,7 +212,7 @@ function Dataset(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
-            <GraphInput></GraphInput>
+            <GraphInput dataMap={dataMap} color={props.backgroundColor}/>
             {/* <SliderInput></SliderInput> */}
           </div>
         </ExpansionPanelDetails>
