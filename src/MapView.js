@@ -3,43 +3,45 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
 
+import MapDetailDrawer from './MapDetailDrawer';
+
 const useStyles = makeStyles(theme => ({
-  mapBox: {
-    width: 600,
-    display: "block",
-    margin: "auto",
-  },
-  mapView: {
+  root: {
+    width: "100%",
+    height: "100%",
+    flexDirection: "column",
+    display: "flex",
     backgroundColor: "white",
   },
+  mapView: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+  },
+  mapSvg: {
+    flex: 1,
+  },
+  detailDrawer: {
+    height: 0,
+    backgroundColor: "gray"
+  }
 }));
 
-const regionAnimation = {
-  normal: {
-    fill:"rgb(200,200,200)",
-    stroke:1,
-  },
-  hover: {
-    alpha: 1,
-    scale: 1.1,
-  }
-}
-
-function RegionBackground({key, regionName}) {
+function RegionBackground({key, regionName, detail}) {
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
-      fill="rgb(200,200,200)"
+      fill={detail === regionName ? "rgb(150,150,150)" : "rgb(200,200,200)"}
       stroke="white"
       strokeWidth={2}
       />
   )
 }
 
-function RegionHighlight({key, regionName}) {
+function RegionHighlight({key, regionName, detail, setDetail}) {
   const x = useMotionValue(0);
-  const c = useTransform(x, [0,1], ["rgb(200,200,200)", "rgb(150,255,150)"]);
+  const c = useTransform(x, [0,1], [detail === regionName ? "rgb(150,150,150)" : "rgb(200,200,200)", "rgb(150,255,150)"]);
   const s = useTransform(x, [0,1], [1, 1.2]);
   const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
@@ -60,33 +62,63 @@ function RegionHighlight({key, regionName}) {
         x:1,
         transition: {duration: 0.1}
       }}
+      onTap={() => {
+        setDetail(regionName);
+      }}
       />
+  )
+}
+
+const drawerVariants = {
+  open: {
+    height: 200,
+  },
+  closed: {
+    height: 0,
+  }
+}
+
+function DetailDrawer({detail, setDetail}) {
+
+  const classes = useStyles();
+
+  return (
+    <motion.div
+      className={classes.detailDrawer}
+      animate={detail === "" ? "closed" : "open"}
+      variants={drawerVariants}
+      onTap={() => {setDetail("");}}>
+      
+    </motion.div>
   )
 }
 
 function MapView({}) {
 
-  console.log([1,4,2,4].sort((a,b) => a-b));
   const classes = useStyles();
-  const [hover, setHover] = useState("");
+
+  const [detail, setDetail] = useState("");
+
   return (
-    <div className={classes.mapView}>
-      <div className={classes.mapBox}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1051.004 1338">
-          {
-            Object.keys(somaliaRegions).sort((a,b) => (a === hover) === (b === hover) ? 0 : ((a === hover) ? 1:-1)).map((regionName, i) => (
-              <RegionBackground key={i} regionName={regionName}/>
-            ))
-          }
-          {
-            Object.keys(somaliaRegions).map((regionName, i) => (
-                <RegionHighlight key={i+200} regionName={regionName}/>
-            ))
-          }
-        </svg>
+    <div className={classes.root}>
+      <div className={classes.mapView} onTap={() => {setDetail("");}}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1051.004 1338"
+            className={classes.mapSvg}>
+            {
+              Object.keys(somaliaRegions).map((regionName, i) => (
+                <RegionBackground key={i} regionName={regionName} detail={detail}/>
+              ))
+            }
+            {
+              Object.keys(somaliaRegions).map((regionName, i) => (
+                  <RegionHighlight key={i+200} regionName={regionName} detail={detail} setDetail={setDetail}/>
+              ))
+            }
+          </svg>
       </div>
+      <DetailDrawer detail={detail} setDetail={setDetail}/>
     </div>
   );
 }
