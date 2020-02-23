@@ -47,12 +47,13 @@ const useStyles = makeStyles(theme => ({
   },
   label: {
     padding: theme.spacing(1),
-    textAlign: "center",
+    textAlign: "right",//"center",
     color: theme.palette.text.secondary,
     height: "20%",
     width:"100/6%",
     backgroundColor: 'transparent',
-    boxShadow: 'none'
+    boxShadow: 'none',
+    fontSize:12,
   },
 }));
 
