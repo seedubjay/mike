@@ -29,11 +29,8 @@ function App() {
   return (
     <div className={classes.root}>
       <SplitPane split="vertical" defaultSize={350} primary="second">
-        <SplitPane split="horizontal" defaultSize="60%">
-          <MapView/>
-          <AnalysisView/>
-        </SplitPane>
-        <SplitPane split="horizontal" defaultSize={150} primary="second">
+        <MapView/>
+        <SplitPane split="horizontal" defaultSize="85%">
           <ControlView region="Somalia"/>
           <RecalculateView/>
         </SplitPane>
