@@ -10,6 +10,23 @@ import { inheritInnerComments } from '@babel/types';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
+const regionData = {
+  "Awdal":['Borama - Maize (white)', 'Borama - Rice (imported)', 'Borama - Sorghum (red)', 'Borama - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Bakool":['Xudur - Maize (white)', 'Xudur - Rice (imported)', 'Xudur - Sorghum (red)', 'Xudur - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Banadir":['Mogadishu - Maize (white)', 'Mogadishu - Rice (imported)', 'Mogadishu - Sorghum (red)', 'Mogadishu - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Bari":['Bossaso - Maize (white)', 'Bossaso - Rice (imported)', 'Bossaso - Sorghum (red)', 'Bossaso - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Bay":['Baidoa - Maize (white)', 'Baidoa - Rice (imported)', 'Baidoa - Sorghum (red)', 'Baidoa - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Hiraan":['Beletweyne - Maize (white)', 'Beletweyne - Rice (imported)', 'Beletweyne - Sorghum (red)', 'Beletweyne - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Lower Juba":['Kismayo - Maize (white)', 'Kismayo - Rice (imported)', 'Kismayo - Rice (imported)', 'Fatalities due to Conflict', 'Temperature'],
+  "Lower Shabelle":['Qorioley - Maize (white)', 'Qorioley - Maize (white)', 'Fatalities due to Conflict', 'Temperature'],
+  "Middle Juba":['Buale - Maize (white)', 'Buale - Rice (imported)', 'Buale - Rice (imported)', 'Fatalities due to Conflict', 'Temperature'],
+  "Mudug":['Gaalkacyo - Maize (white)', 'Gaalkacyo - Rice (imported)', 'Gaalkacyo - Sorghum (red)', 'Gaalkacyo - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Nugaal":['Garowe - Maize (white)', 'Garowe - Rice (imported)', 'Garowe - Sorghum (red)', 'Garowe - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+  "Sool":['Lasanod - Rice (imported)', 'Lasanod - Sorghum (white)', 'Lasanod - Sorghum (white)', 'Fatalities due to Conflict', 'Temperature'],
+  "Woqooyi Galbeed":['Hargeysa - Maize (white)', 'Hargeysa - Rice (imported)', 'Hargeysa - Sorghum (red)', 'Hargeysa - Sorghum (red)', 'Fatalities due to Conflict', 'Temperature'],
+}
+
+
 const BAR_WIDTH = 20;
 
 const useStyles = makeStyles(theme => ({
@@ -17,6 +34,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#F2F2F2",
     height: "100%",
     display: 'flex',
+    width: "100%",
   },
   settingsList: {
     padding: 10,
@@ -256,26 +274,31 @@ function ControlViewForRegion(props) {
     
 }
 
+
+
 function ControlView(props) {
   const classes = useStyles();
+  var controls = [];
   if (props.region == "Somalia") {
+      for (var key of Object.keys(regionData)) { 
+          controls = controls.concat(regionData[key]);
+      }
+      controls = controls.filter((a,b) => controls.indexOf(a) === b);
+  } else {
+      controls = regionData[props.region];
+  }
+      var list;
+      if (Array.isArray(controls) && controls.length > 0){
+          list = controls.map((item, index) => <Dataset backgroundColor={index%2===0?(index%4===0?"lightgreen":"orange"):(index%4===1?"lightblue":"red")} name={item}/>);
+      } 
       return (
         <div className={classes.root}>
           <div className={classes.settingsList}>
-              <Dataset backgroundColor="lightgreen" name="Food Prices"/>
-              <Dataset backgroundColor="orange" name="Food Availability"/>
-              <Dataset backgroundColor="lightblue" name="Rainfall"/>
-              <Dataset backgroundColor="red" name="Pasture Availability"/>          
-              <Dataset backgroundColor="red" name="Pasture Availability"/>
-              <Dataset backgroundColor="red" name="Pasture Availability"/>
-
+              {list}
           </div>
         </div>
       );
-  } else {
-      return ControlViewForRegion(props);
   }
   
-}
 
 export default ControlView;
