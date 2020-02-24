@@ -6,7 +6,6 @@ import './App.css';
 
 import MapView from './MapView';
 import ControlView from './ControlView';
-import AnalysisView from './AnalysisView';
 import RecalculateView from './RecalculateView';
 
 const useStyles = makeStyles(theme => ({
