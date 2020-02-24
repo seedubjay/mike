@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
+import regionData from './regionData'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,7 +22,8 @@ const useStyles = makeStyles(theme => ({
   },
   detailDrawer: {
     height: 0,
-    backgroundColor: "gray"
+    backgroundColor: "lightgray",
+    overflow: "scroll",
   }
 }));
 
@@ -80,13 +82,21 @@ function DetailDrawer({detail, setDetail}) {
 
   const classes = useStyles();
 
+  var details;
+  if (typeof regionData[detail] === "undefined") {
+      details = <p>{"Unfortunately, we don't have enough data to give an accurate model for this region."}</p>;
+  } else {
+      details = regionData[detail].map(a => <div><p>{a}</p></div>);
+  }
+
   return (
     <motion.div
       className={classes.detailDrawer}
       animate={detail === "" ? "closed" : "open"}
       variants={drawerVariants}
       onTap={() => {setDetail("");}}>
-      
+      <h2>{detail}</h2>
+      {details}
     </motion.div>
   )
 }
