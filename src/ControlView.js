@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   innerSettingsBox: {
-    height:190,
+    height:170,
     backgroundColor: "#FAFAFA",
     width: 'max-width',
     flexGrow: 100,
@@ -131,7 +131,7 @@ function SliderThumbComponents(props) {
   );
 }
 
-function BarGraphInput({datapoint, color, label}) {
+function BarGraphInput({datapoint, color, label, disabled}) {
   const classes = useStyles();
 
   let [value, setValue] = useState(datapoint);
@@ -150,6 +150,7 @@ function BarGraphInput({datapoint, color, label}) {
           defaultValue={value}
           style={{"color":color}} //style={{"color":{color}}} doesn't work
           onChange={(_,v) => {setValue(v)}}
+          disabled={disabled}
           />
       </Paper>
       <Paper className={classes.label}>{label}</Paper> 
@@ -167,24 +168,12 @@ function GraphInput(props){
   dataMap.forEach((datapoint, label)=>{
     if(i>(dataMap.size-6)-1){
       graphs.push(
-        <BarGraphInput datapoint={datapoint} color={props.color} label={label}/>
+        <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false}/>
       )
     }
     else {
       graphs.push(
-        <div>
-            <Paper className={classes.paper}>
-              <BarGraphSlider
-                ThumbComponent={SliderThumbComponents}
-                orientation="vertical"
-                valueLabelDisplay="auto"
-                aria-label="bar graph slider"
-                defaultValue={datapoint}
-                style={{"color":"grey"}} //style={{"color":{color}}} doesn't work
-              />
-            </Paper>
-            <Paper className={classes.label}>{label}</Paper>
-          </div>
+        <BarGraphInput datapoint={datapoint} color="grey" label={label} disabled={true}/> //style={{"color":{color}}} doesn't work
       )
     }
     i++;
