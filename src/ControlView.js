@@ -7,9 +7,11 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { getThemeProps } from '@material-ui/styles';
 import { inheritInnerComments } from '@babel/types';
+import SplitPane, { Pane } from 'react-split-pane';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import regionData from './regionData'
+import RecalculateView from './RecalculateView';
 
 const BAR_WIDTH = 20;
 
@@ -242,16 +244,16 @@ function SliderInput() {
 }
 
 function chooseColor(item) {
-    if (item === "Temperature") return "lightblue";
-    if (item === "Fatalities due to Conflict") return "red";
-    if (item.includes("Maize")) return "lightyellow";
-    if (item.includes("Rice")) return "lightgreen";
+    if (item === "Temperature") return "#65c8e6";
+    if (item === "Fatalities due to Conflict") return "#F55D5D";
+    if (item.includes("Maize")) return "#fadd87";
+    if (item.includes("Rice")) return "#85c785";
     if (item.includes("Sorghum")) return "orange";
     return "pink";
     
 }
 
-function ControlView(props) {
+function ControlList(props) {
   const classes = useStyles();
   var controls = [];
   if (props.region == "Somalia") {
@@ -273,6 +275,19 @@ function ControlView(props) {
           </div>
         </div>
       );
+  }
+
+  function ControlView(props) {
+    const classes = useStyles();
+
+    return (
+      <SplitPane split="horizontal" defaultSize="85%">
+        <ControlList region={props.region}/>
+        <div class={classes.root}>
+          <RecalculateView/>
+        </div>
+      </SplitPane>
+    );
   }
   
 

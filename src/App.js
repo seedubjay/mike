@@ -6,7 +6,6 @@ import './App.css';
 
 import MapView from './MapView';
 import ControlView from './ControlView';
-import RecalculateView from './RecalculateView';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,10 +28,7 @@ function App() {
     <div className={classes.root}>
       <SplitPane split="vertical" defaultSize={350} primary="second">
         <MapView/>
-        <SplitPane split="horizontal" defaultSize="85%">
-          <ControlView region="Somalia"/>
-          <RecalculateView/>
-        </SplitPane>
+        <ControlView region="Somalia"/>
       </SplitPane>
     </div>
   );
