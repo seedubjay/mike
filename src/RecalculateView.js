@@ -12,20 +12,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function RecalculateView() {
+function RecalculateView({isQuerying, setIsQuerying}) {
     const classes = useStyles();
 
     return (
       <div class={classes.buttonContainer}>
-        <Button variant="contained" onClick={() => handleClick()}>Run Model</Button>
+        <Button variant="contained" onClick={() => setIsQuerying(true)}>Run Model</Button>
       </div>
     );
-}
-
-function handleClick() {
-  //TODO: link up to backend
-  alert("Hello World");
-  return;
 }
   
 export default RecalculateView;

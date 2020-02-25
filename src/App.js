@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import SplitPane, { Pane } from 'react-split-pane';
 import { Slider, makeStyles } from '@material-ui/core';
@@ -24,11 +24,16 @@ const useStyles = makeStyles(theme => ({
 function App() {
   const classes = useStyles();
 
+  const [detail, setDetail] = useState("");
+
+  const [isQuerying, setIsQuerying] = useState(false);
+
   return (
     <div className={classes.root}>
+      
       <SplitPane split="vertical" defaultSize={350} primary="second">
-        <MapView/>
-        <ControlView region="Somalia"/>
+        <MapView detail={detail} setDetail={setDetail}/>
+        <ControlView region={detail}/>
       </SplitPane>
     </div>
   );

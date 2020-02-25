@@ -73,11 +73,9 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
   )
 }
 
-function MapView({}) {
+function MapView({detail, setDetail}) {
 
   const classes = useStyles();
-
-  const [detail, setDetail] = useState("");
 
   return (
     <div className={classes.root}>
