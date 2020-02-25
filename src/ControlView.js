@@ -256,7 +256,7 @@ function chooseColor(item) {
 function ControlList(props) {
   const classes = useStyles();
   var controls = [];
-  if (props.region == "Somalia") {
+  if (props.region == "") {
       for (var key of Object.keys(regionData)) { 
           controls = controls.concat(regionData[key]);
       }
