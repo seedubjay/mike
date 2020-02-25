@@ -1,14 +1,23 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
+import {makeStyles} from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+  buttonContainer: {
+    width: "100%",
+    display: "flex",
+    padding: 10,
+    alignContent: "center",
+    justifyContent: "center",
+  }
+}));
 
 function RecalculateView() {
+    const classes = useStyles();
+
     return (
-      <div style={{backgroundColor: "#E4E4E4",
-                   display: "flex",
-                   justifyContent: "center",
-                   alignItems: "center",
-                   width: "100%",
-                   height: "100%"}}>
-          <button onClick={handleClick}><h2>Re-run the model</h2></button>
+      <div class={classes.buttonContainer}>
+        <Button variant="contained">Run Model</Button>
       </div>
     );
 }
