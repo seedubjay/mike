@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -7,9 +7,11 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { getThemeProps } from '@material-ui/styles';
 import { inheritInnerComments } from '@babel/types';
+import SplitPane, { Pane } from 'react-split-pane';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import regionData from './regionData'
+import RecalculateView from './RecalculateView';
 
 const BAR_WIDTH = 20;
 
@@ -129,6 +131,32 @@ function SliderThumbComponents(props) {
   );
 }
 
+function BarGraphInput({datapoint, color, label}) {
+  const classes = useStyles();
+
+  let [value, setValue] = useState(datapoint);
+
+  return (
+    <div>
+      <Paper className={classes.label}>
+        {value}
+      </Paper> 
+      <Paper className={classes.paper}>
+        <BarGraphSlider
+          ThumbComponent={SliderThumbComponents}
+          orientation="vertical"
+          valueLabelDisplay="auto"
+          aria-label="bar graph slider"
+          defaultValue={value}
+          style={{"color":color}} //style={{"color":{color}}} doesn't work
+          onChange={(_,v) => {setValue(v)}}
+          />
+      </Paper>
+      <Paper className={classes.label}>{label}</Paper> 
+    </div>
+  );
+}
+
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
 function GraphInput(props){
   const classes = useStyles();
@@ -139,19 +167,7 @@ function GraphInput(props){
   dataMap.forEach((datapoint, label)=>{
     if(i>(dataMap.size-6)-1){
       graphs.push(
-        <div>
-            <Paper className={classes.paper}>
-              <BarGraphSlider
-                ThumbComponent={SliderThumbComponents}
-                orientation="vertical"
-                valueLabelDisplay="auto"
-                aria-label="bar graph slider"
-                defaultValue={datapoint}
-                style={{"color":props.color}} //style={{"color":{color}}} doesn't work
-              />
-            </Paper>
-            <Paper className={classes.label}>{label}</Paper>          
-          </div>
+        <BarGraphInput datapoint={datapoint} color={props.color} label={label}/>
       )
     }
     else {
@@ -242,19 +258,19 @@ function SliderInput() {
 }
 
 function chooseColor(item) {
-    if (item === "Temperature") return "lightblue";
-    if (item === "Fatalities due to Conflict") return "red";
-    if (item.includes("Maize")) return "lightyellow";
-    if (item.includes("Rice")) return "lightgreen";
+    if (item === "Temperature") return "#65c8e6";
+    if (item.includes("Fatalities")) return "#F55D5D";
+    if (item.includes("Maize")) return "#fadd87";
+    if (item.includes("Rice")) return "#85c785";
     if (item.includes("Sorghum")) return "orange";
     return "pink";
     
 }
 
-function ControlView(props) {
+function ControlList(props) {
   const classes = useStyles();
   var controls = [];
-  if (props.region == "Somalia") {
+  if (props.region == "") {
       for (var key of Object.keys(regionData)) { 
           controls = controls.concat(regionData[key]);
       }
@@ -273,6 +289,19 @@ function ControlView(props) {
           </div>
         </div>
       );
+  }
+
+  function ControlView(props) {
+    const classes = useStyles();
+
+    return (
+      <SplitPane split="horizontal" defaultSize="85%">
+        <ControlList region={props.region}/>
+        <div class={classes.root}>
+          <RecalculateView/>
+        </div>
+      </SplitPane>
+    );
   }
   
 
