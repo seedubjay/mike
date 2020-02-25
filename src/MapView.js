@@ -63,10 +63,10 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         transition: {duration: 0.1}
       }}
       onTap={() => {
-        if (detail == "") {
-          setDetail(regionName);
-        } else {
+        if (detail == regionName) {
           setDetail("");
+        } else {
+          setDetail(regionName);
         }
       }}
       />
