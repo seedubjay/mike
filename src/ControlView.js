@@ -274,7 +274,9 @@ function ControlList(props) {
       return (
         <div className={classes.root}>
           <div className={classes.settingsList}>
-              {list}
+          <h3>Data Simulation</h3>
+            <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
+            {list}
           </div>
         </div>
       );

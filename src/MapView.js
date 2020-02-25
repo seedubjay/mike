@@ -27,6 +27,10 @@ const useStyles = makeStyles(theme => ({
     height: 0,
     backgroundColor: "lightgray",
     overflow: "scroll",
+  },
+  title: {
+    margin: 5,
+    marginLeft: 30,
   }
 }));
 
@@ -82,6 +86,9 @@ function MapView({detail, setDetail}) {
 
   return (
     <div className={classes.root}>
+      <div class={classes.title}>
+        <h1>Somalia</h1>
+      </div>
       <div className={classes.mapView} onTap={() => {setDetail("");}}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
