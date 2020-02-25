@@ -16,7 +16,8 @@
     "react-leaflet-shapefile": "^2.0.0",
     "react-scripts": "3.4.0",
     "react-scrollbar": "^0.5.6",
-    "react-split-pane": "^0.1.89"
+    "react-split-pane": "^0.1.89",
+    "shpjs": "^3.4.3"
   },
   "scripts": {
     "start": "react-scripts start",

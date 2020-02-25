@@ -33,7 +33,7 @@ function App() {
       
       <SplitPane split="vertical" defaultSize={350} primary="second">
         <MapView detail={detail} setDetail={setDetail}/>
-        <ControlView region={detail}/>
+        <ControlView region={detail} setIsQuerying={setIsQuerying}/>
       </SplitPane>
     </div>
   );

@@ -27,7 +27,21 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: "lightgray",
       overflow: "scroll",
     },
-    
+    row: {
+      display: "flex",
+    },
+    col40: {
+      flex: "40%",
+      margin: 20,
+    },
+    col50: {
+      flex: "50%",
+      margin: 20,
+    },
+    col60: {
+      flex: "60%",
+      margin: 20,
+    },
   }));
 
 function LikelihoodStat() {
@@ -76,14 +90,15 @@ function DetailDrawer({detail, setDetail}) {
         animate={detail === "" ? "closed" : "open"}
         variants={drawerVariants}
         onTap={() => {setDetail("");}}>
-        
-        <Container>
-            <Row>
-                <Col><LikelihoodStat /></Col>
-                <Col><Stats details={details} name={detail}/> </Col>
-            </Row>
-             
-        </Container>
+      
+        <div class={classes.row}>
+          <div class={classes.col40}>
+            <LikelihoodStat />
+          </div>
+          <div class={classes.col60}>
+            <Stats details={details} name={detail}/>
+          </div>
+        </div>
         
       </motion.div>
     )

@@ -284,7 +284,7 @@ function ControlList(props) {
       <SplitPane split="horizontal" defaultSize="85%">
         <ControlList region={props.region}/>
         <div class={classes.root}>
-          <RecalculateView/>
+          <RecalculateView setIsQuerying={props.setIsQuerying}/>
         </div>
       </SplitPane>
     );
