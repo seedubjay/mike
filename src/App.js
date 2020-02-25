@@ -25,12 +25,15 @@ const useStyles = makeStyles(theme => ({
 function App() {
   const classes = useStyles();
 
+  const [detail, setDetail] = useState("");
+
   return (
     <div className={classes.root}>
+      
       <SplitPane split="vertical" defaultSize={350} primary="second">
-        <MapView/>
+        <MapView detail={detail} setDetail={setDetail}/>
         <SplitPane split="horizontal" defaultSize="85%">
-          <ControlView region="Somalia"/>
+          <ControlView region={detail}/>
           <RecalculateView/>
         </SplitPane>
       </SplitPane>
