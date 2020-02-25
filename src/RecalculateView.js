@@ -17,7 +17,7 @@ function RecalculateView() {
 
     return (
       <div class={classes.buttonContainer}>
-        <Button variant="contained">Run Model</Button>
+        <Button variant="contained" onClick={() => handleClick()}>Run Model</Button>
       </div>
     );
 }
