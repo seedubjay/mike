@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function RecalculateView() {
+function RecalculateView({isQuerying, setIsQuerying}) {
     const classes = useStyles();
 
     return (
@@ -23,8 +23,7 @@ function RecalculateView() {
 }
 
 function handleClick() {
-  //TODO: link up to backend
-  alert("Hello World");
+  setIsQuerying(true);
   return;
 }
   

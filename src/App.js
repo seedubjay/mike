@@ -27,6 +27,8 @@ function App() {
 
   const [detail, setDetail] = useState("");
 
+  const [isQuerying, setIsQuerying] = useState(false);
+
   return (
     <div className={classes.root}>
       
@@ -34,7 +36,7 @@ function App() {
         <MapView detail={detail} setDetail={setDetail}/>
         <SplitPane split="horizontal" defaultSize="85%">
           <ControlView region={detail}/>
-          <RecalculateView/>
+          <RecalculateView isQuerying={isQuerying}/>
         </SplitPane>
       </SplitPane>
     </div>
