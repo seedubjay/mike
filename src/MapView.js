@@ -3,6 +3,9 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
+import regionData from './regionData'
+
+const availableRegions = Object.keys(regionData);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,10 +66,10 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         transition: {duration: 0.1}
       }}
       onTap={() => {
-        if (detail == regionName) {
+        if (detail == regionName || !availableRegions.includes(regionName)) {
           setDetail("");
         } else {
-          setDetail(regionName);
+            setDetail(regionName);          
         }
       }}
       />
@@ -90,7 +93,7 @@ function MapView({detail, setDetail}) {
               ))
             }
             {
-              Object.keys(somaliaRegions).map((regionName, i) => (
+              Object.keys(somaliaRegions).filter(regionName => availableRegions.includes(regionName)).map((regionName, i) => (
                   <RegionHighlight key={i+200} regionName={regionName} detail={detail} setDetail={setDetail}/>
               ))
             }
