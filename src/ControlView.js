@@ -245,7 +245,7 @@ function SliderInput() {
 
 function chooseColor(item) {
     if (item === "Temperature") return "#65c8e6";
-    if (item === "Fatalities due to Conflict") return "#F55D5D";
+    if (item.includes("Fatalities")) return "#F55D5D";
     if (item.includes("Maize")) return "#fadd87";
     if (item.includes("Rice")) return "#85c785";
     if (item.includes("Sorghum")) return "orange";
