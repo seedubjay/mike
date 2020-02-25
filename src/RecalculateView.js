@@ -17,14 +17,9 @@ function RecalculateView({isQuerying, setIsQuerying}) {
 
     return (
       <div class={classes.buttonContainer}>
-        <Button variant="contained" onClick={() => handleClick()}>Run Model</Button>
+        <Button variant="contained" onClick={() => setIsQuerying(true)}>Run Model</Button>
       </div>
     );
-}
-
-function handleClick() {
-  setIsQuerying(true);
-  return;
 }
   
 export default RecalculateView;
