@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import SplitPane, { Pane } from 'react-split-pane';
 import { Slider, makeStyles } from '@material-ui/core';
