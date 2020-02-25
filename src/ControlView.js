@@ -9,6 +9,7 @@ import { getThemeProps } from '@material-ui/styles';
 import { inheritInnerComments } from '@babel/types';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import regionData from './regionData'
 
 const BAR_WIDTH = 20;
 
@@ -17,6 +18,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#F2F2F2",
     height: "100%",
     display: 'flex',
+    width: "100%",
   },
   settingsList: {
     padding: 10,
@@ -239,43 +241,39 @@ function SliderInput() {
   )
 }
 
-function ControlViewForRegion(props) {
-    const classes = useStyles();
-    return (
-      <div className={classes.root}>
-        <div className={classes.settingsList}>
-            <Dataset backgroundColor="lightgreen" name={props.region+" - Price of AAAAA"}/>
-            <Dataset backgroundColor="orange" name={props.region+" - Price of BBBBB"}/>
-            <Dataset backgroundColor="lightblue" name={props.region+" - Price of CCCCC"}/>
-            <Dataset backgroundColor="yellow" name={props.region+" - Price of DDDDD"}/>
-            <Dataset backgroundColor="red" name={props.region+" - Fatalities"}/>
-
-        </div>
-      </div>
-    );
+function chooseColor(item) {
+    if (item === "Temperature") return "lightblue";
+    if (item === "Fatalities due to Conflict") return "red";
+    if (item.includes("Maize")) return "lightyellow";
+    if (item.includes("Rice")) return "lightgreen";
+    if (item.includes("Sorghum")) return "orange";
+    return "pink";
     
 }
 
 function ControlView(props) {
   const classes = useStyles();
+  var controls = [];
   if (props.region == "Somalia") {
+      for (var key of Object.keys(regionData)) { 
+          controls = controls.concat(regionData[key]);
+      }
+      controls = controls.filter((a,b) => controls.indexOf(a) === b);
+  } else {
+      controls = regionData[props.region];
+  }
+      var list;
+      if (Array.isArray(controls) && controls.length > 0){
+          list = controls.map((item, index) => <Dataset backgroundColor={chooseColor(item)} name={item}/>);
+      } 
       return (
         <div className={classes.root}>
           <div className={classes.settingsList}>
-              <Dataset backgroundColor="lightgreen" name="Food Prices"/>
-              <Dataset backgroundColor="orange" name="Food Availability"/>
-              <Dataset backgroundColor="lightblue" name="Rainfall"/>
-              <Dataset backgroundColor="red" name="Pasture Availability"/>          
-              <Dataset backgroundColor="red" name="Pasture Availability"/>
-              <Dataset backgroundColor="red" name="Pasture Availability"/>
-
+              {list}
           </div>
         </div>
       );
-  } else {
-      return ControlViewForRegion(props);
   }
   
-}
 
 export default ControlView;

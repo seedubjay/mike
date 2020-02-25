@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
+import DetailDrawer from './DetailDrawer';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,7 +22,8 @@ const useStyles = makeStyles(theme => ({
   },
   detailDrawer: {
     height: 0,
-    backgroundColor: "gray"
+    backgroundColor: "lightgray",
+    overflow: "scroll",
   }
 }));
 
@@ -61,33 +63,13 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         transition: {duration: 0.1}
       }}
       onTap={() => {
-        setDetail(regionName);
+        if (detail == regionName) {
+          setDetail("");
+        } else {
+          setDetail(regionName);
+        }
       }}
       />
-  )
-}
-
-const drawerVariants = {
-  open: {
-    height: 200,
-  },
-  closed: {
-    height: 0,
-  }
-}
-
-function DetailDrawer({detail, setDetail}) {
-
-  const classes = useStyles();
-
-  return (
-    <motion.div
-      className={classes.detailDrawer}
-      animate={detail === "" ? "closed" : "open"}
-      variants={drawerVariants}
-      onTap={() => {setDetail("");}}>
-      
-    </motion.div>
   )
 }
 
