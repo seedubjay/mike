@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -131,6 +131,32 @@ function SliderThumbComponents(props) {
   );
 }
 
+function BarGraphInput({datapoint, color, label}) {
+  const classes = useStyles();
+
+  let [value, setValue] = useState(datapoint);
+
+  return (
+    <div>
+      <Paper className={classes.label}>
+        {value}
+      </Paper> 
+      <Paper className={classes.paper}>
+        <BarGraphSlider
+          ThumbComponent={SliderThumbComponents}
+          orientation="vertical"
+          valueLabelDisplay="auto"
+          aria-label="bar graph slider"
+          defaultValue={value}
+          style={{"color":color}} //style={{"color":{color}}} doesn't work
+          onChange={(_,v) => {setValue(v)}}
+          />
+      </Paper>
+      <Paper className={classes.label}>{label}</Paper> 
+    </div>
+  );
+}
+
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
 function GraphInput(props){
   const classes = useStyles();
@@ -141,19 +167,7 @@ function GraphInput(props){
   dataMap.forEach((datapoint, label)=>{
     if(i>(dataMap.size-6)-1){
       graphs.push(
-        <div>
-            <Paper className={classes.paper}>
-              <BarGraphSlider
-                ThumbComponent={SliderThumbComponents}
-                orientation="vertical"
-                valueLabelDisplay="auto"
-                aria-label="bar graph slider"
-                defaultValue={datapoint}
-                style={{"color":props.color}} //style={{"color":{color}}} doesn't work
-              />
-            </Paper>
-            <Paper className={classes.label}>{label}</Paper>          
-          </div>
+        <BarGraphInput datapoint={datapoint} color={props.color} label={label}/>
       )
     }
     else {
