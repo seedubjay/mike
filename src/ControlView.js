@@ -131,7 +131,16 @@ function SliderThumbComponents(props) {
   );
 }
 
-function BarGraphInput({datapoint, color, label, disabled}) {
+function maxVal(item) {
+    if (item === "Temperature") return 50;
+    if (item.includes("Fatalities")) return 9999;
+    if (item.includes("Maize")) return 30;
+    if (item.includes("Rice")) return 60;
+    if (item.includes("Sorghum")) return 20;
+    return 100;    
+}
+
+function BarGraphInput({datapoint, color, label, disabled, name}) {
   const classes = useStyles();
 
   let [value, setValue] = useState(datapoint);
@@ -151,6 +160,8 @@ function BarGraphInput({datapoint, color, label, disabled}) {
           style={{"color":color}} //style={{"color":{color}}} doesn't work
           onChange={(_,v) => {setValue(v)}}
           disabled={disabled}
+          min={0}
+          max={maxVal(name)}
           />
       </Paper>
       <Paper className={classes.label}>{label}</Paper> 
@@ -168,12 +179,12 @@ function GraphInput(props){
   dataMap.forEach((datapoint, label)=>{
     if(i>(dataMap.size-6)-1){
       graphs.push(
-        <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false}/>
+        <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false} name={props.name}/>
       )
     }
     else {
       graphs.push(
-        <BarGraphInput datapoint={datapoint} color="grey" label={label} disabled={true}/> //style={{"color":{color}}} doesn't work
+        <BarGraphInput datapoint={datapoint} color="grey" label={label} disabled={true} name={props.name}/> //style={{"color":{color}}} doesn't work
       )
     }
     i++;
@@ -219,7 +230,7 @@ function Dataset(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
-            <GraphInput dataMap={dataMap} color={props.backgroundColor}/>
+            <GraphInput dataMap={dataMap} color={props.backgroundColor} name={props.name}/>
             {/* <SliderInput></SliderInput> */}
           </div>
         </ExpansionPanelDetails>
