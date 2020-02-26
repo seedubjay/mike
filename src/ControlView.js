@@ -13,7 +13,7 @@ import Grid from "@material-ui/core/Grid";
 import regionData from './regionData'
 import RecalculateView from './RecalculateView';
 
-const BAR_WIDTH = 20;
+const BAR_WIDTH = 17;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: 1,
   },
   paper: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
     textAlign: "center",
     color: theme.palette.text.secondary,
     height: "60%",
@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     width:{BAR_WIDTH},
     backgroundColor: 'transparent',
     boxShadow: 'none',
-    fontSize:11,
+    fontSize:10,
   },
 }));
 
@@ -182,6 +182,7 @@ function GraphInput(props){
   let i = 0;
 
   dataMap.forEach((datapoint, label)=>{
+    // only allows the most recent 6 entries to be editable
     if(i>(dataMap.size-6)-1){
       graphs.push(
         <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false} name={props.name}/>
@@ -195,16 +196,41 @@ function GraphInput(props){
     i++;
   });
 
-
   return (
     <div className={classes.root}>
-      <Grid container spacing={5}>
-        <Grid container item xs={12} spacing={0}>
+      <Grid container spacing={0}>
+        {/* <Grid container item xs={12} spacing={0}> */}
           {graphs}
-        </Grid>
+        {/* </Grid> */}
       </Grid>
     </div>
   );
+}
+
+function includeUnitsInTitle(title){
+  if (title === "Temperature") return "Temperature: °C";
+  if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum")) return title + ": SOS per kg";
+  return title;
+}
+
+const MONTH_MAP = new Map([
+  ["1", "Jan"],
+  ["2", "Feb"],
+  ["3", "Mar"],
+  ["4", "Apr"],
+  ["5", "May"],
+  ["6", "Jun"],
+  ["7", "Jul"],
+  ["8", "Aug"],
+  ["9", "Sep"],
+  ["10", "Oct"],
+  ["11", "Nov"],
+  ["12", "Dec"],
+]);
+
+// TODO: when linking with backend, use this to convert a year and month pair into a graph label
+function ConvertYearMonthToGraphLabel(year, month){
+  return MONTH_MAP.get(month) + "\'" + year.slice(-2);
 }
 
 function Dataset(props) {
@@ -213,18 +239,18 @@ function Dataset(props) {
   // test values for bar graphs
   // TODO: Link to back end
   let dataMap = new Map([
-    ["Feb", 10],
-    ["Mar", 99],
-    ["Apr", 52],
-    ["May", 53],
-    ["Jun", 58],
-    ["Jul", 58],
-    ["Aug", 58],
-    ["Sep", 58],
-    ["Oct", 58],
-    ["Nov", 58],
-    ["Dec", 58],
-    ["Jan", 20],
+    [ConvertYearMonthToGraphLabel("2019", "2"), 10],
+    ["Mar'19", 99],
+    ["Apr'19", 52],
+    ["May'19", 53],
+    ["Jun'19", 58],
+    ["Jul'19", 58],
+    ["Aug'19", 58],
+    ["Sep'19", 58],
+    ["Oct'19", 58],
+    ["Nov'19", 58],
+    ["Dec'19", 58],
+    ["Jan'20", 20],
   ]);
 
   return (
@@ -232,7 +258,7 @@ function Dataset(props) {
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
         >
-          <Typography className={classes.heading}>{props.name}</Typography>
+          <Typography className={classes.heading}>{includeUnitsInTitle(props.name)}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
@@ -272,7 +298,6 @@ function chooseColor(item) {
     if (item.includes("Rice")) return "#85c785";
     if (item.includes("Sorghum")) return "orange";
     return "pink";
-    
 }
 
 function getAllControls() {
