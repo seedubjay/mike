@@ -5,6 +5,9 @@ import SplitPane, { Pane } from 'react-split-pane';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {makeStyles, Container} from '@material-ui/core';
 import regionData from './regionData'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import IconButton from '@material-ui/core/IconButton';
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -30,11 +33,16 @@ const useStyles = makeStyles(theme => ({
     row: {
       display: "flex",
     },
+    col1: {
+      flex: "1%",
+      "margin-top": 20,
+      "margin-right":20,
+    },
     col40: {
       flex: "40%",
       margin: 20,
     },
-    col50: {
+    col10: {
       flex: "50%",
       margin: 20,
     },
@@ -42,13 +50,18 @@ const useStyles = makeStyles(theme => ({
       flex: "60%",
       margin: 20,
     },
+    col99: {
+      flex: "99%",
+      "margin-top": 20,
+      "margin-right":20,
+    },
   }));
 
-function LikelihoodStat() {
+function LikelihoodStat({tier2, tier3}) {
     return (
         <div>
-            <h2>Tier 2: __%</h2>
-            <h2>Tier 3: __%</h2>
+            <h2>Tier 2: {tier2}%</h2>
+            <h2>Tier 3: {tier3}%</h2>
         </div>
     );
 }
@@ -82,18 +95,26 @@ function DetailDrawer({detail, setDetail}) {
         details = regionData[detail].map(a => <div><p>{a}</p></div>);
     }
 
-
-    //TODO: get columns to work
     return (
       <motion.div
         className={classes.detailDrawer}
         animate={detail === "" ? "closed" : "open"}
-        variants={drawerVariants}
-        onTap={() => {setDetail("");}}>
+        variants={drawerVariants}>
       
+        
+        <div class={classes.row}>
+          <div class={classes.col99}>
+          </div>
+          <div class={classes.col1}>
+          {/* consider using ExpandMoreIcon directly rather than IconButton to appear less laggy */}
+          <IconButton aria-label="expand">
+            <ExpandMoreIcon onClick={() => {setDetail("");}}/>
+          </IconButton>
+          </div>
+        </div>
         <div class={classes.row}>
           <div class={classes.col40}>
-            <LikelihoodStat />
+            <LikelihoodStat tier2="__" tier3="__"/>
           </div>
           <div class={classes.col60}>
             <Stats details={details} name={detail}/>

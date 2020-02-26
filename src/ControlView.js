@@ -110,7 +110,7 @@ const BarGraphSlider = withStyles({
     '$vertical &':{
       width:17,
       // change color to black when hovering
-      // TODO: fix this, doesn't work all the time
+      // TODO: fix this, doesn't work all the time because of the thumb element blocking
       "&$focusVisible,&:hover":{
         backgroundColor:"#000000",
       }

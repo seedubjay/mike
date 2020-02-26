@@ -73,7 +73,7 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         if (detail == regionName || !availableRegions.includes(regionName)) {
           setDetail("");
         } else {
-            setDetail(regionName);          
+          setDetail(regionName);          
         }
       }}
       />
