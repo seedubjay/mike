@@ -131,6 +131,11 @@ function SliderThumbComponents(props) {
   );
 }
 
+/**
+ * Get the maximum value of a slider bar given the type of feature
+ * @param  {String} item    The name of the feature
+ * @return {Number}         The maximum value that slider can take
+ */
 function maxVal(item) {
     if (item === "Temperature") return 50;
     if (item.includes("Fatalities")) return 9999;
@@ -206,6 +211,7 @@ function Dataset(props) {
   const classes = useStyles();
 
   // test values for bar graphs
+  // TODO: Link to back end
   let dataMap = new Map([
     ["Feb", 10],
     ["Mar", 99],
@@ -238,6 +244,8 @@ function Dataset(props) {
   )
 }
 
+
+// THIS ISN'T USED
 function SliderInput() {
   const classes = useStyles();
   return (
@@ -267,21 +275,30 @@ function chooseColor(item) {
     
 }
 
+function getAllControls() {
+    var x = [];
+    for (var key of Object.keys(regionData)) { 
+        x = x.concat(regionData[key]);
+    }
+    x = x.filter((a,b) => x.indexOf(a) === b);
+    var dict = {};
+    x.forEach(item => dict[item] = <Dataset backgroundColor={chooseColor(item)} name={item}/>)
+    return dict;
+}
+
 function ControlList(props) {
   const classes = useStyles();
+  
+  const [allControls, _] = useState(getAllControls());
+  
+  var list;
   var controls = [];
   if (props.region == "") {
-      for (var key of Object.keys(regionData)) { 
-          controls = controls.concat(regionData[key]);
-      }
-      controls = controls.filter((a,b) => controls.indexOf(a) === b);
+      list = Object.values(allControls);
   } else {
-      controls = regionData[props.region];
+      list = Object.keys(allControls).filter(item => regionData[props.region].includes(item)).map(item => allControls[item]);
   }
-      var list;
-      if (Array.isArray(controls) && controls.length > 0){
-          list = controls.map((item, index) => <Dataset backgroundColor={chooseColor(item)} name={item}/>);
-      } 
+      
       return (
         <div className={classes.root}>
           <div className={classes.settingsList}>
