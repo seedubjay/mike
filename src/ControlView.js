@@ -236,23 +236,6 @@ function ConvertYearMonthToGraphLabel(year, month){
 function Dataset(props) {
   const classes = useStyles();
 
-  // test values for bar graphs
-  // TODO: Link to back end
-  let dataMap = new Map([
-    [ConvertYearMonthToGraphLabel("2019", "2"), 10],
-    ["Mar'19", 99],
-    ["Apr'19", 52],
-    ["May'19", 53],
-    ["Jun'19", 58],
-    ["Jul'19", 58],
-    ["Aug'19", 58],
-    ["Sep'19", 58],
-    ["Oct'19", 58],
-    ["Nov'19", 58],
-    ["Dec'19", 58],
-    ["Jan'20", 20],
-  ]);
-
   return (
       <ExpansionPanel className={classes.outerSettingsBox} style={{backgroundColor: props.backgroundColor}}>
         <ExpansionPanelSummary
@@ -262,7 +245,7 @@ function Dataset(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
-            <GraphInput dataMap={dataMap} color={props.backgroundColor} name={props.name}/>
+            <GraphInput dataMap={props.dataMap} color={props.backgroundColor} name={props.name}/>
             {/* <SliderInput></SliderInput> */}
           </div>
         </ExpansionPanelDetails>
@@ -301,14 +284,33 @@ function chooseColor(item) {
 }
 
 function getAllControls() {
-    var x = [];
-    for (var key of Object.keys(regionData)) { 
-        x = x.concat(regionData[key]);
-    }
-    x = x.filter((a,b) => x.indexOf(a) === b);
-    var dict = {};
-    x.forEach(item => dict[item] = <Dataset backgroundColor={chooseColor(item)} name={item}/>)
-    return dict;
+  var x = [];
+  for (var key of Object.keys(regionData)) { 
+      x = x.concat(regionData[key]);
+  }
+  x = x.filter((a,b) => x.indexOf(a) === b);
+    
+  // test values for bar graphs
+  // TODO: Link to back end, such that you can get the data using the x 
+  // Examples of x: "Maize (white) - Borama | Awdal - Fatalities due to Conflict | ..."
+  let dataMap = new Map([
+    [ConvertYearMonthToGraphLabel("2019", "2"), 10],
+    ["Mar'19", 99],
+    ["Apr'19", 52],
+    ["May'19", 53],
+    ["Jun'19", 58],
+    ["Jul'19", 58],
+    ["Aug'19", 58],
+    ["Sep'19", 58],
+    ["Oct'19", 58],
+    ["Nov'19", 58],
+    ["Dec'19", 58],
+    ["Jan'20", 20],
+  ]);
+
+  var dict = {};
+  x.forEach(item => dict[item] = <Dataset dataMap={dataMap} backgroundColor={chooseColor(item)} name={item}/>)
+  return dict;
 }
 
 function ControlList(props) {
