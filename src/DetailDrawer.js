@@ -57,11 +57,34 @@ const useStyles = makeStyles(theme => ({
     },
   }));
 
-function LikelihoodStat({tier2, tier3}) {
+function convertFloatStringToPercent(floatString){
+  return (parseFloat(floatString)*100).toString()
+}
+
+// params: obj is an Object having relevant data about predictions for a particular IPC phase
+  // e.g. {
+      //   "68" : [0.2, 0.3],
+      //   "95" : [0.1, 0.4],
+      //   "mean" : 0.25
+      // },
+function objectToStatistics (obj){
+  return convertFloatStringToPercent(obj["mean"]) + "% (" + 
+  convertFloatStringToPercent(obj[95][0]) + "-" + convertFloatStringToPercent(obj[95][1]) + "%)*";
+}
+
+  // params: tier2 is an Object having relevant data about predictions for IPC Phase 2
+  // e.g. {
+      //   "68" : [0.2, 0.3],
+      //   "95" : [0.1, 0.4],
+      //   "mean" : 0.25
+      // },
+function LikelihoodStat({tier2, tier3, tier4}) {
     return (
         <div>
-            <h2>Tier 2: {tier2}%</h2>
-            <h2>Tier 3: {tier3}%</h2>
+            <h4 padding={0}>{"Phase 2: " + objectToStatistics(tier2)}</h4>
+            <h4 padding={0}>{"Phase 3: " + objectToStatistics(tier3)}</h4>
+            <h4 padding={0}>{"Phase 4: " + objectToStatistics(tier4)}</h4>
+            <h6>* 95% confidence interval</h6>
         </div>
     );
 }
@@ -69,7 +92,7 @@ function LikelihoodStat({tier2, tier3}) {
 function Stats({details, name}) {
     return (
         <div>
-            <h2>{name}</h2>
+            <h3 padding={0}>{name}</h3>
             {details}
         </div>
     );
@@ -95,13 +118,25 @@ function DetailDrawer({detail, setDetail}) {
         details = regionData[detail].map(a => <div><p>{a}</p></div>);
     }
 
+    // TODO: replace this with actual data fetched from API
+    // i.e. use an Object having relevant data about predictions for a particular IPC phase
+      // e.g. {
+          //   "68" : [0.2, 0.3],
+          //   "95" : [0.1, 0.4],
+          //   "mean" : 0.25
+          // },
+    let testData = {
+      "68" : [0.2, 0.3],
+      "95" : [0.1, 0.4],
+      "mean" : 0.25
+    }
+
     return (
       <motion.div
         className={classes.detailDrawer}
         animate={detail === "" ? "closed" : "open"}
         variants={drawerVariants}>
       
-        
         <div class={classes.row}>
           <div class={classes.col99}>
           </div>
@@ -114,7 +149,8 @@ function DetailDrawer({detail, setDetail}) {
         </div>
         <div class={classes.row}>
           <div class={classes.col40}>
-            <LikelihoodStat tier2="__" tier3="__"/>
+            {/* TODO: replace with actual data fetched from API. Assuming there are only 4 tiers as shown in Freddie's GitHub repo example */}
+            <LikelihoodStat tier2={testData} tier3={testData} tier4={testData}/>
           </div>
           <div class={classes.col60}>
             <Stats details={details} name={detail}/>
