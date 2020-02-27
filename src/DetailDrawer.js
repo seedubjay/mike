@@ -74,15 +74,23 @@ function LikelihoodStat({ipcPredsForRegion}) {
     return(<div></div>);
   }
   let quartile = Object.keys(ipcPredsForRegion)[0];
-  let phase2 = ipcPredsForRegion[quartile]["P2"];
-  let phase3 = ipcPredsForRegion[quartile]["P3"];
-  let phase4 = ipcPredsForRegion[quartile]["P4"];
+  // normalise sum of phase probabilities
+  let phase2 = ipcPredsForRegion[quartile]["P2"]['mean'];
+  let phase3 = ipcPredsForRegion[quartile]["P3"]['mean'];
+  let phase4 = ipcPredsForRegion[quartile]["P4"]['mean'];
+  let sum = phase2 + phase3 + phase4;
+  phase2 *= 1/sum;
+  phase3 *= 1/sum;
+  phase4 *= 1/sum;
+  ipcPredsForRegion[quartile]["P2"]['mean'] = phase2;
+  ipcPredsForRegion[quartile]["P3"]['mean'] = phase3;
+  ipcPredsForRegion[quartile]["P4"]['mean'] = phase4;
     return (
         <div>
             <h3 padding={0}>{quartile + " Population Prediction"}</h3>
-            {["Phase 2: " + objectToStatistics(phase2),
-            "Phase 3: " + objectToStatistics(phase3),
-            "Phase 4: " + objectToStatistics(phase4)].map(a => <div><p>{a}</p></div>)}
+            {["Phase 2: " + objectToStatistics(ipcPredsForRegion[quartile]["P2"]),
+            "Phase 3: " + objectToStatistics(ipcPredsForRegion[quartile]["P3"]),
+            "Phase 4: " + objectToStatistics(ipcPredsForRegion[quartile]["P4"])].map(a => <div><p>{a}</p></div>)}
             <small>* 95% confidence interval</small>
         </div>
     );
@@ -112,11 +120,15 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
   
     var details;
     // TODO: is this still accurate? Or should we base this on the IPC predictions?
-    if (typeof regionData[detail] === "undefined") {
-        details = <p>{"Unfortunately, we don't have enough data to give an accurate model for this region."}</p>;
-    } else {
+    if (typeof regionData[detail] !== "undefined") {
         details = regionData[detail].map(a => <div><p>{a}</p></div>);
     }
+
+    // if (typeof regionData[detail] === "undefined") {
+    //   details = <p>{"Unfortunately, we don't have enough data to give an accurate model for this region."}</p>;
+    // } else {
+    //     details = regionData[detail].map(a => <div><p>{a}</p></div>);
+    // }
 
     return (
       <motion.div
@@ -127,7 +139,6 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
         
         <div className={classes.row}>
           <div className={classes.ipcCol}>
-            {/* TODO: replace with actual data fetched from API. Assuming there are only 4 tiers as shown in Freddie's GitHub repo example */}
             <LikelihoodStat ipcPredsForRegion={ipcPreds[detail]}/>
           </div>
           <div class={classes.regionFactorsCol}>

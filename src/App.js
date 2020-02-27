@@ -28,8 +28,6 @@ function App() {
 
   const [isQuerying, setIsQuerying] = useState(false);
 
-
-
   return (
     <div className={classes.root}>
       
