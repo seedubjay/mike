@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -165,7 +165,10 @@ function BarGraphInput({ datapoint, color, label, disabled, name, cb }) {
           aria-label="bar graph slider"
           defaultValue={datapoint}
           style={{ "color": color }} //style={{"color":{color}}} doesn't work
-          onChange={(_, v) => { setValue(v); cb(v); }}
+          onChange={(_, v) => {
+            setValue(v);
+            cb(v);
+          }}
           disabled={disabled}
           min={minVal(name)}
           max={maxVal(name)}
@@ -193,7 +196,8 @@ function GraphInput(props) {
             color={i > (data.length - 6) - 1 ? props.color : "grey"}
             label={x.label}
             disabled={i <= (data.length - 6) - 1}
-            name={props.name} cb={x.cb} />
+            name={props.name}
+            cb={x.cb} />
         ))}
         {/* </Grid> */}
       </Grid>
@@ -222,7 +226,6 @@ const MONTH_MAP = new Map([
   ["12", "Dec"],
 ]);
 
-// TODO: when linking with backend, use this to convert a year and month pair into a graph label
 function ConvertYearMonthToGraphLabel(year, month) {
   return MONTH_MAP.get(month) + "\'" + year.slice(-2);
 }
@@ -240,7 +243,6 @@ function Dataset(props) {
       <ExpansionPanelDetails>
         <div className={classes.innerSettingsBox}>
           <GraphInput data={props.data} color={props.backgroundColor} name={props.name} />
-          {/* <SliderInput></SliderInput> */}
         </div>
       </ExpansionPanelDetails>
     </ExpansionPanel>
@@ -275,7 +277,7 @@ function ControlList({data, visible}) {
   );
 }
 
-function ControlView({region, isQuerying, setIsQuerying}) {
+function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
   const classes = useStyles();
 
   let [data, setData] = useState({});
@@ -324,8 +326,8 @@ function ControlView({region, isQuerying, setIsQuerying}) {
               datasets[name].push({
                 label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
                 value: row[value_column],
-                cb: (v) => {console.log(`${name} ${row[year_column]} ${row[month_column]} ${v}`)},
-              });
+                cb: setChangedValues(name, row[year_column], row[month_column]),
+              }); 
             });
           })
         })
@@ -338,10 +340,11 @@ function ControlView({region, isQuerying, setIsQuerying}) {
       .catch(console.log);
   }, []);
 
-  console.log(regionFactors);
   return (
     <SplitPane split="horizontal" defaultSize="85%">
-      <ControlList data={data} visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])}/>
+      <ControlList
+        data={data}
+        visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
       <div class={classes.root}>
         <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
       </div>
