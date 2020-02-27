@@ -6,7 +6,6 @@ import './App.css';
 
 import MapView from './MapView';
 import ControlView from './ControlView';
-import Store, {Context} from './Store';
 
 const useStyles = makeStyles(theme => ({
   root: {
