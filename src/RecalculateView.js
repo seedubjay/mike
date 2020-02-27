@@ -15,14 +15,17 @@ const useStyles = makeStyles(theme => ({
   row: {
     display: "flex",
     alignContent: "center",
+    textAlign: "center",
+    position: "relative",
     float: "none",
   },
   col: {
-    margin: 10,
+    height: "100%",
     flex: "50%",
     alignContent: "center",
     textAlign: "center",
     float: "none",
+    display: "inline-block",
   }
 }));
 
@@ -45,7 +48,7 @@ function RecalculateView({isQuerying, setIsQuerying}) {
         <Fade
           in={!progress}
           style={{
-            transitionDelay: progress ? '800ms' : '0ms',
+            transitionDelay: progress ? '1ms' : '0ms',
           }}
           unmountOnExit
         >
