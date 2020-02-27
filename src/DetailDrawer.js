@@ -33,32 +33,23 @@ const useStyles = makeStyles(theme => ({
     row: {
       display: "flex",
     },
-    col1: {
+    collapseButtonCol: {
       flex: "1%",
       "margin-top": 20,
       "margin-right":20,
     },
-    col40: {
-      flex: "30%",
-      margin: 20,
-    },
-    col10: {
+    ipcCol: {
       flex: "50%",
       margin: 20,
     },
-    col60: {
-      flex: "60%",
+    regionFactorsCol: {
+      flex: "50%",
       margin: 20,
-    },
-    col99: {
-      flex: "99%",
-      "margin-top": 20,
-      "margin-right":20,
     },
   }));
 
 function convertFloatStringToPercent(floatString){
-  return (parseFloat(floatString)*100).toString()
+  return Math.round(parseFloat(floatString)*100).toString()
 }
 
 // params: obj is an Object having relevant data about predictions for a particular IPC phase
@@ -72,18 +63,26 @@ function objectToStatistics (obj){
   convertFloatStringToPercent(obj[95][0]) + "-" + convertFloatStringToPercent(obj[95][1]) + "%)*";
 }
 
-  // params: tier2 is an Object having relevant data about predictions for IPC Phase 2
+  // params: phase2 is an Object having relevant data about predictions for IPC Phase 2
   // e.g. {
       //   "68" : [0.2, 0.3],
       //   "95" : [0.1, 0.4],
       //   "mean" : 0.25
       // },
-function LikelihoodStat({tier2, tier3, tier4}) {
+function LikelihoodStat({ipcPredsForRegion}) {
+  if(ipcPredsForRegion === undefined){
+    return(<div></div>);
+  }
+  let quartile = Object.keys(ipcPredsForRegion)[0];
+  let phase2 = ipcPredsForRegion[quartile]["P2"];
+  let phase3 = ipcPredsForRegion[quartile]["P3"];
+  let phase4 = ipcPredsForRegion[quartile]["P4"];
     return (
         <div>
-            <h4 padding={0}>{"Phase 2: " + objectToStatistics(tier2)}</h4>
-            <h4 padding={0}>{"Phase 3: " + objectToStatistics(tier3)}</h4>
-            <h4 padding={0}>{"Phase 4: " + objectToStatistics(tier4)}</h4>
+            <h3 padding={0}>{quartile + " Population Prediction"}</h3>
+            <h4 padding={0}>{"Phase 2: " + objectToStatistics(phase2)}</h4>
+            <h4 padding={0}>{"Phase 3: " + objectToStatistics(phase3)}</h4>
+            <h4 padding={0}>{"Phase 4: " + objectToStatistics(phase4)}</h4>
             <h6>* 95% confidence interval</h6>
         </div>
     );
@@ -107,28 +106,16 @@ const drawerVariants = {
     }
   }
 
-function DetailDrawer({detail, setDetail}) {
+function DetailDrawer({detail, setDetail, ipcPreds}) {
 
     const classes = useStyles();
   
     var details;
+    // TODO: is this still accurate? Or should we base this on the IPC predictions?
     if (typeof regionData[detail] === "undefined") {
         details = <p>{"Unfortunately, we don't have enough data to give an accurate model for this region."}</p>;
     } else {
         details = regionData[detail].map(a => <div><p>{a}</p></div>);
-    }
-
-    // TODO: replace this with actual data fetched from API
-    // i.e. use an Object having relevant data about predictions for a particular IPC phase
-      // e.g. {
-          //   "68" : [0.2, 0.3],
-          //   "95" : [0.1, 0.4],
-          //   "mean" : 0.25
-          // },
-    let testData = {
-      "68" : [0.2, 0.3],
-      "95" : [0.1, 0.4],
-      "mean" : 0.25
     }
 
     return (
@@ -139,14 +126,14 @@ function DetailDrawer({detail, setDetail}) {
       
         
         <div className={classes.row}>
-          <div className={classes.col40}>
+          <div className={classes.ipcCol}>
             {/* TODO: replace with actual data fetched from API. Assuming there are only 4 tiers as shown in Freddie's GitHub repo example */}
-            <LikelihoodStat tier2={testData} tier3={testData} tier4={testData}/>
+            <LikelihoodStat ipcPredsForRegion={ipcPreds[detail]}/>
           </div>
-          <div class={classes.col60}>
+          <div class={classes.regionFactorsCol}>
             <Stats details={details} name={detail}/>
           </div>
-          <div class={classes.col1}>
+          <div class={classes.collapseButtonCol}>
             {/* consider using ExpandMoreIcon directly rather than IconButton to appear less laggy */}
             <IconButton aria-label="expand">
               <ExpandMoreIcon onClick={() => {setDetail("");}}/>
