@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -161,7 +161,7 @@ function BarGraphInput({datapoint, color, label, disabled, name}) {
           orientation="vertical"
           valueLabelDisplay="auto"
           aria-label="bar graph slider"
-          defaultValue={value}
+          defaultValue={datapoint}
           style={{"color":color}} //style={{"color":{color}}} doesn't work
           onChange={(_,v) => {setValue(v)}}
           disabled={disabled}
@@ -316,7 +316,7 @@ function getAllControls() {
 function ControlList(props) {
   const classes = useStyles();
   
-  const [allControls, _] = useState(getAllControls());
+  const allControls = getAllControls();
   
   var list;
   var controls = [];
@@ -339,6 +339,24 @@ function ControlList(props) {
 
   function ControlView(props) {
     const classes = useStyles();
+
+    let [data, setData] = useState([]);
+
+    useEffect(() => {
+      fetch("http://localhost:5000/data/all", {
+        crossDomain: true,
+        headers: {'Content-Type':'application/json'}
+      })
+        .then(res => res.json())
+        .then((result) => {
+          console.log(result);
+          let datasets = []
+          Object.keys(result["regions"]).map(region => {
+            console.log(result["regions"][region]);
+          })
+        })
+        .catch(console.log);
+    }, []);
 
     return (
       <SplitPane split="horizontal" defaultSize="85%">

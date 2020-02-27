@@ -138,8 +138,8 @@ function DetailDrawer({detail, setDetail}) {
         variants={drawerVariants}>
       
         
-        <div class={classes.row}>
-          <div class={classes.col40}>
+        <div className={classes.row}>
+          <div className={classes.col40}>
             {/* TODO: replace with actual data fetched from API. Assuming there are only 4 tiers as shown in Freddie's GitHub repo example */}
             <LikelihoodStat tier2={testData} tier3={testData} tier4={testData}/>
           </div>
