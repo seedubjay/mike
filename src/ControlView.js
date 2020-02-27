@@ -348,10 +348,10 @@ function ControlList(props) {
         headers: {'Content-Type':'application/json'}
       })
         .then(res => res.json())
-        .then((result) => {
+        .then((result) => { // takes in json format of data
           console.log(result);
           let datasets = []
-          Object.keys(result["regions"]).map(region => {
+          Object.keys(result["regions"]).map(region => { // iterate over regions and print data
             console.log(result["regions"][region]);
           })
         })

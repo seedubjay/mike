@@ -34,12 +34,32 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function RegionBackground({key, regionName, detail}) {
+function RegionBackground({key, regionName, detail, ipcSeverity}) {
+  // TODO: may have to convert ipcSeverity from string to float
+  // ipcSeverity may be the proportion of people on IPC level 3 and above
+  
+  let unSelectedColour;
+  switch(ipcSeverity){
+    // TODO: may have to change this comparison, depending on what the undefined/null value is
+    case ipcSeverity === undefined:
+      unSelectedColour = "Grey";
+      break;
+    case ipcSeverity < 0.2:
+      unSelectedColour = "LightPink";
+      break;
+    case ipcSeverity < 0.5:
+      unSelectedColour = "Red";
+      break;
+    default:
+      unSelectedColour = "Maroon";
+      break;
+  }
+  
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
-      fill={detail === regionName ? "rgb(150,150,150)" : "rgb(200,200,200)"}
+      fill={detail === regionName ? "Black" : unSelectedColour} // previously "rgb(150,150,150)": "rgb(200,200,200)"
       stroke="white"
       strokeWidth={2}
       />
@@ -96,7 +116,7 @@ function MapView({detail, setDetail}) {
             className={classes.mapSvg}>
             {
               Object.keys(somaliaRegions).map((regionName, i) => (
-                <RegionBackground key={i} regionName={regionName} detail={detail}/>
+                <RegionBackground key={i} regionName={regionName} detail={detail} ipcSeverity={0.3}/>
               ))
             }
             {
