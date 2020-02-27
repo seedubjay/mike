@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fade from '@material-ui/core/Fade';
-import {makeStyles, Container} from '@material-ui/core';
+import { makeStyles, Container } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   buttonContainer: {
@@ -15,14 +15,17 @@ const useStyles = makeStyles(theme => ({
   row: {
     display: "flex",
     alignContent: "center",
+    textAlign: "center",
+    position: "relative",
     float: "none",
   },
   col: {
-    margin: 10,
+    height: "100%",
     flex: "50%",
     alignContent: "center",
     textAlign: "center",
     float: "none",
+    display: "inline-block",
   }
 }));
 
@@ -30,46 +33,44 @@ function handleClick() {
 
 }
 
-function RecalculateView({isQuerying, setIsQuerying}) {
-    const classes = useStyles();
+function RecalculateView({ isQuerying, setIsQuerying }) {
+  const classes = useStyles();
 
-    const [progress, setProgress] = React.useState(false);
-    const handleClick = () => {
-      setProgress(true);
-      setIsQuerying(true);
-    };
+  const handleClick = () => {
+    setIsQuerying(true);
+  };
 
-    return (
-      <div class={classes.buttonContainer}>
-        <div className={classes.placeholder}>
+  return (
+    <div class={classes.buttonContainer}>
+      <div className={classes.placeholder}>
         <Fade
-          in={!progress}
+          in={!isQuerying}
           style={{
-            transitionDelay: progress ? '800ms' : '0ms',
+            transitionDelay: isQuerying ? '1ms' : '0ms',
           }}
           unmountOnExit
         >
           <Button variant="contained" onClick={handleClick}>Run Model</Button>
         </Fade>
-          <Fade
-            in={progress}
-            style={{
-              transitionDelay: progress ? '800ms' : '0ms',
-            }}
-            unmountOnExit
-          >
-            <div class={classes.row}>
-              <div class={classes.col}>
-                <CircularProgress />
-              </div>
-              <div class={classes.col}>
-                <h5>Running Model...</h5>
-              </div>
-            </div>       
-          </Fade>
-        </div>
+        <Fade
+          in={isQuerying}
+          style={{
+            transitionDelay: isQuerying ? '800ms' : '0ms',
+          }}
+          unmountOnExit
+        >
+          <div className={classes.row}>
+            <div className={classes.col}>
+              <CircularProgress />
+            </div>
+            <div className={classes.col}>
+              <h5>Running Model...</h5>
+            </div>
+          </div>
+        </Fade>
       </div>
-    );
+    </div>
+  );
 }
-  
+
 export default RecalculateView;

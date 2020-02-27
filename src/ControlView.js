@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   innerSettingsBox: {
-    height:170,
+    height: 170,
     backgroundColor: "#FAFAFA",
     width: 'max-width',
     flexGrow: 100,
@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     textAlign: "center",
     color: theme.palette.text.secondary,
     height: "60%",
-    width:{BAR_WIDTH},
+    width: { BAR_WIDTH },
     backgroundColor: 'transparent',
     boxShadow: 'none'
   },
@@ -57,10 +57,10 @@ const useStyles = makeStyles(theme => ({
     textAlign: "right",
     color: theme.palette.text.secondary,
     height: "5%",
-    width:{BAR_WIDTH},
+    width: { BAR_WIDTH },
     backgroundColor: 'transparent',
     boxShadow: 'none',
-    fontSize:10,
+    fontSize: 10,
   },
 }));
 
@@ -73,7 +73,7 @@ const BarGraphSlider = withStyles({
     width: 8,
     // TODO: do something when hovering over the bar graph
     // good with detecting hovering, but can't find a way to change the ui that is graphically appealing
-    "&$focusVisible,&:hover":{
+    "&$focusVisible,&:hover": {
       // borderColor:'black',
       // borderRadius:3,
       // backgroundColor:"#000000",
@@ -83,8 +83,8 @@ const BarGraphSlider = withStyles({
     },
   },
   thumb: {
-    height: {BAR_WIDTH},
-    width: {BAR_WIDTH},
+    height: { BAR_WIDTH },
+    width: { BAR_WIDTH },
     backgroundColor: "transparent",
     left: 20, // cannot use BAR_WIDTH
     // marginTop: -8,
@@ -95,30 +95,30 @@ const BarGraphSlider = withStyles({
     "& .bar": {
       height: 1,
       width: 9,
-      backgroundColor:"#fff",
+      backgroundColor: "#fff",
       marginLeft: 1,
       marginRight: 1,
-      marginTop:15
+      marginTop: 15
     },
   },
-  vertical:{
-    width:{BAR_WIDTH},
+  vertical: {
+    width: { BAR_WIDTH },
   },
   active: {},
   valueLabel: {},
   track: {
-    '$vertical &':{
-      width:17,
+    '$vertical &': {
+      width: 17,
       // change color to black when hovering
       // TODO: fix this, doesn't work all the time because of the thumb element blocking
-      "&$focusVisible,&:hover":{
-        backgroundColor:"#000000",
+      "&$focusVisible,&:hover": {
+        backgroundColor: "#000000",
       }
     }
   },
   rail: {
-    '$vertical &':{
-      width:17,
+    '$vertical &': {
+      width: 17,
     }
   }
 })(Slider);
@@ -131,21 +131,22 @@ function SliderThumbComponents(props) {
   );
 }
 
-/**
- * Get the maximum value of a slider bar given the type of feature
- * @param  {String} item    The name of the feature
- * @return {Number}         The maximum value that slider can take
- */
-function maxVal(item) {
-    if (item === "Temperature") return 50;
-    if (item.includes("Fatalities")) return 9999;
-    if (item.includes("Maize")) return 30;
-    if (item.includes("Rice")) return 60;
-    if (item.includes("Sorghum")) return 20;
-    return 100;    
+function minVal(item) {
+  if (item === "Temperature") return 30;
+  return 0;
 }
 
-function BarGraphInput({datapoint, color, label, disabled, name}) {
+function maxVal(item) {
+  if (item === "Temperature") return 110;
+  if (item.includes("Fatalities")) return 200;
+  if (item.includes("Maize")) return 10000;
+  if (item.includes("Rice")) return 10000;
+  if (item.includes("Sorghum")) return 10000;
+  if (item.includes("Cowpeas")) return 20000;
+  return 100;
+}
+
+function BarGraphInput({ datapoint, color, label, disabled, name, cb }) {
   const classes = useStyles();
 
   let [value, setValue] = useState(datapoint);
@@ -154,7 +155,7 @@ function BarGraphInput({datapoint, color, label, disabled, name}) {
     <div>
       <Paper className={classes.label}>
         {value}
-      </Paper> 
+      </Paper>
       <Paper className={classes.paper}>
         <BarGraphSlider
           ThumbComponent={SliderThumbComponents}
@@ -162,53 +163,45 @@ function BarGraphInput({datapoint, color, label, disabled, name}) {
           valueLabelDisplay="auto"
           aria-label="bar graph slider"
           defaultValue={datapoint}
-          style={{"color":color}} //style={{"color":{color}}} doesn't work
-          onChange={(_,v) => {setValue(v)}}
+          style={{ "color": color }} //style={{"color":{color}}} doesn't work
+          onChange={(_, v) => { setValue(v); cb(v); }}
           disabled={disabled}
-          min={0}
+          min={minVal(name)}
           max={maxVal(name)}
-          />
+        />
       </Paper>
-      <Paper className={classes.label}>{label}</Paper> 
+      <Paper className={classes.label}>{label}</Paper>
     </div>
   );
 }
 
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
-function GraphInput(props){
+function GraphInput(props) {
   const classes = useStyles();
-  let dataMap = props.dataMap;
-  const graphs = [];
-  let i = 0;
-
-  dataMap.forEach((datapoint, label)=>{
-    // only allows the most recent 6 entries to be editable
-    if(i>(dataMap.size-6)-1){
-      graphs.push(
-        <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false} name={props.name}/>
-      )
-    }
-    else {
-      graphs.push(
-        <BarGraphInput datapoint={datapoint} color="grey" label={label} disabled={true} name={props.name}/> //style={{"color":{color}}} doesn't work
-      )
-    }
-    i++;
-  });
+  let data = props.data;
 
   return (
     <div className={classes.root}>
       <Grid container spacing={0}>
         {/* <Grid container item xs={12} spacing={0}> */}
-          {graphs}
+        {data.map((x,i) => (
+          // only allows the most recent 6 entries to be editable
+          <BarGraphInput
+            key={i}
+            datapoint={Math.round(x.value)}
+            color={i > (data.length - 6) - 1 ? props.color : "grey"}
+            label={x.label}
+            disabled={i <= (data.length - 6) - 1}
+            name={props.name} cb={x.cb} />
+        ))}
         {/* </Grid> */}
       </Grid>
     </div>
   );
 }
 
-function includeUnitsInTitle(title){
-  if (title === "Temperature") return "Temperature: °C";
+function includeUnitsInTitle(title) {
+  if (title === "Temperature") return "Temperature: °F";
   if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum")) return title + ": SOS per kg";
   return title;
 }
@@ -229,7 +222,7 @@ const MONTH_MAP = new Map([
 ]);
 
 // TODO: when linking with backend, use this to convert a year and month pair into a graph label
-function ConvertYearMonthToGraphLabel(year, month){
+function ConvertYearMonthToGraphLabel(year, month) {
   return MONTH_MAP.get(month) + "\'" + year.slice(-2);
 }
 
@@ -237,136 +230,123 @@ function Dataset(props) {
   const classes = useStyles();
 
   return (
-      <ExpansionPanel className={classes.outerSettingsBox} style={{backgroundColor: props.backgroundColor}}>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-        >
-          <Typography className={classes.heading}>{includeUnitsInTitle(props.name)}</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <div className={classes.innerSettingsBox}>
-            <GraphInput dataMap={props.dataMap} color={props.backgroundColor} name={props.name}/>
-            {/* <SliderInput></SliderInput> */}
-          </div>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-  )
-}
-
-
-// THIS ISN'T USED
-function SliderInput() {
-  const classes = useStyles();
-  return (
-    <div className={classes.innerSettingsBox}>
-      <div className={classes.slider}>
-          <Slider
-            defaultValue={30}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            step={10}
-            marks
-            min={10}
-            max={110}
-          />
+    <ExpansionPanel className={classes.outerSettingsBox} style={{ backgroundColor: props.backgroundColor }}>
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+      >
+        <Typography className={classes.heading}>{includeUnitsInTitle(props.name)}</Typography>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className={classes.innerSettingsBox}>
+          <GraphInput data={props.data} color={props.backgroundColor} name={props.name} />
+          {/* <SliderInput></SliderInput> */}
         </div>
-    </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
   )
 }
 
 function chooseColor(item) {
-    if (item === "Temperature") return "#65c8e6";
-    if (item.includes("Fatalities")) return "#F55D5D";
-    if (item.includes("Maize")) return "#fadd87";
-    if (item.includes("Rice")) return "#85c785";
-    if (item.includes("Sorghum")) return "orange";
-    return "pink";
+  if (item === "Temperature") return "#65c8e6";
+  if (item.includes("Fatalities")) return "#F55D5D";
+  if (item.includes("Maize")) return "#fadd87";
+  if (item.includes("Rice")) return "#85c785";
+  if (item.includes("Sorghum")) return "orange";
+  return "pink";
 }
 
-function getAllControls() {
-  var x = [];
-  for (var key of Object.keys(regionData)) { 
-      x = x.concat(regionData[key]);
-  }
-  x = x.filter((a,b) => x.indexOf(a) === b);
-    
-  // test values for bar graphs
-  // TODO: Link to back end, such that you can get the data using the x 
-  // Examples of x: "Maize (white) - Borama | Awdal - Fatalities due to Conflict | ..."
-  let dataMap = new Map([
-    [ConvertYearMonthToGraphLabel("2019", "2"), 10],
-    ["Mar'19", 99],
-    ["Apr'19", 52],
-    ["May'19", 53],
-    ["Jun'19", 58],
-    ["Jul'19", 58],
-    ["Aug'19", 58],
-    ["Sep'19", 58],
-    ["Oct'19", 58],
-    ["Nov'19", 58],
-    ["Dec'19", 58],
-    ["Jan'20", 20],
-  ]);
-
-  var dict = {};
-  x.forEach(item => dict[item] = <Dataset dataMap={dataMap} backgroundColor={chooseColor(item)} name={item}/>)
-  return dict;
-}
-
-function ControlList(props) {
+function ControlList({data, visible}) {
   const classes = useStyles();
-  
-  const allControls = getAllControls();
-  
-  var list;
-  var controls = [];
-  if (props.region == "") {
-      list = Object.values(allControls);
-  } else {
-      list = Object.keys(allControls).filter(item => regionData[props.region].includes(item)).map(item => allControls[item]);
-  }
-      
-      return (
-        <div className={classes.root}>
-          <div className={classes.settingsList}>
-          <h3>Data Simulation</h3>
-            <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
-            {list}
-          </div>
-        </div>
-      );
-  }
+  return (
+    <div className={classes.root}>
+      <div className={classes.settingsList}>
+        <h3>Data Simulation</h3>
+        <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
+        {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
+          <Dataset
+            key={i}
+            data={data[k]}
+            backgroundColor={chooseColor(k)}
+            name={k} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-  function ControlView(props) {
-    const classes = useStyles();
+function ControlView({region, isQuerying, setIsQuerying}) {
+  const classes = useStyles();
 
-    let [data, setData] = useState([]);
+  let [data, setData] = useState({});
 
-    useEffect(() => {
-      fetch("http://localhost:5000/data/all", {
-        crossDomain: true,
-        headers: {'Content-Type':'application/json'}
-      })
-        .then(res => res.json())
-        .then((result) => { // takes in json format of data
-          console.log(result);
-          let datasets = []
-          Object.keys(result["regions"]).map(region => { // iterate over regions and print data
-            console.log(result["regions"][region]);
+  let [regionFactors, setRegionFactors] = useState({});
+
+  useEffect(() => {
+    fetch("http://localhost:5000/data/all", {
+      crossDomain: true,
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then((result) => {
+        console.log(result);
+
+        let datasets = {}
+        let rf = {}
+        Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).map(region => {
+          let df = result["regions"][region]
+          rf[region] = df.historical_data._feature_names
+          df.historical_data._feature_names.filter(name => !(name in datasets)).map(name => {
+            datasets[name] = []
+            let date_column = df.historical_data[name].columns.findIndex(x => x === "Date");
+            let year_column = df.historical_data[name].columns.findIndex(x => x === "Year");
+            let month_column = df.historical_data[name].columns.findIndex(x => x === "Month");
+            var value_column = df.historical_data[name].columns.findIndex(x => x === "Temperature");
+            if (value_column === -1) {
+              value_column = df.historical_data[name].columns.findIndex(x => x === "Fatalities");
+            }
+            if (value_column === -1) {
+              value_column = df.historical_data[name].columns.findIndex(x => x === "Price");
+            }
+            let lastData = df.historical_data[name].rows.map(row => row[date_column]).reduce((a,b) => Math.max(a,b));
+            console.log(df.historical_data[name].rows.map(row => row[date_column]));
+            console.log(lastData);
+            
+            let recent = df.historical_data[name].rows.sort((a, b) => a[date_column] - b[date_column]).slice(-6);
+            let next = df.predicted_data[name].rows.filter(row => row[date_column] > lastData).sort((a, b) => a[date_column] - b[date_column]).slice(0,6);
+            recent.map(row => {
+              datasets[name].push({
+                label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
+                value: row[value_column],
+              });
+            });
+            next.map(row => {
+              datasets[name].push({
+                label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
+                value: row[value_column],
+                cb: (v) => {console.log(`${name} ${row[year_column]} ${row[month_column]} ${v}`)},
+              });
+            });
           })
         })
-        .catch(console.log);
-    }, []);
 
-    return (
-      <SplitPane split="horizontal" defaultSize="85%">
-        <ControlList region={props.region}/>
-        <div class={classes.root}>
-          <RecalculateView setIsQuerying={props.setIsQuerying}/>
-        </div>
-      </SplitPane>
-    );
-  }
-  
+        setRegionFactors(rf);
+        setData(datasets);
+
+        console.log(datasets);
+      })
+      .catch(console.log);
+  }, []);
+
+  console.log(regionFactors);
+  return (
+    <SplitPane split="horizontal" defaultSize="85%">
+      <ControlList data={data} visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])}/>
+      <div class={classes.root}>
+        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
+      </div>
+    </SplitPane>
+  );
+}
+
 
 export default ControlView;
