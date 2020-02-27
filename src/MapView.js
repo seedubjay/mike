@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
@@ -34,12 +34,34 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function RegionBackground({key, regionName, detail}) {
+function RegionBackground({key, regionName, detail, ipcPreds}) {
+  // ipcSeverity is currently the proportion of people on IPC level 3 and above
+  // TODO: make it an interpolation of the official IPC level colours
+  let ipcSeverity;
+  if (regionName in ipcPreds){
+    let ipcSpecificQuartilePreds = ipcPreds[regionName][Object.keys(ipcPreds[regionName])[0]];
+    ipcSeverity = ipcSpecificQuartilePreds["P2"]["mean"] + ipcSpecificQuartilePreds["P3"]["mean"];
+  }
+
+  let unSelectedColour;
+  if (ipcSeverity === undefined){
+    unSelectedColour = "Grey";
+  }
+  else if (ipcSeverity < 0.1){
+    unSelectedColour = "LightPink";
+  }
+  else if (ipcSeverity < 0.5){
+    unSelectedColour = "Red";
+  }
+  else {
+    unSelectedColour = "Maroon";
+  }
+  
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
-      fill={detail === regionName ? "rgb(150,150,150)" : "rgb(200,200,200)"}
+      fill={detail === regionName ? "Black" : unSelectedColour} // previously "rgb(150,150,150)": "rgb(200,200,200)"
       stroke="white"
       strokeWidth={2}
       />
@@ -80,9 +102,41 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
   )
 }
 
+// e.g. "20201" becomes "2020Q1"
+function formatYearQuartileString(yearQuartileAPIString){
+  return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
+}
+
 function MapView({detail, setDetail}) {
 
   const classes = useStyles();
+
+  let [ipcPreds, setIPCPreds] = useState({});
+
+  // TODO: allow the code to only fetch regional data on updates?
+  useEffect(() => {
+    fetch("http://localhost:5000/prediction/summary", {
+      crossDomain: true,
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then((result) => {
+        console.log(result);
+
+        let preds = {};
+
+        Object.keys(result["data"]).filter(region => result["data"][region].fitted).map(region => {
+          let df = result["data"][region]["data"];
+          let lastQuartilePredicted = Object.keys(df).reduce((a, b) => df[a] > df[b] ? a : b);
+          let lastQuartileString = formatYearQuartileString(lastQuartilePredicted);
+          preds[region] = {};
+          preds[region][lastQuartileString] = df[lastQuartilePredicted];
+        })
+        console.log(preds);
+        setIPCPreds(preds);
+      })
+      .catch(console.log);
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -96,7 +150,7 @@ function MapView({detail, setDetail}) {
             className={classes.mapSvg}>
             {
               Object.keys(somaliaRegions).map((regionName, i) => (
-                <RegionBackground key={i} regionName={regionName} detail={detail}/>
+                <RegionBackground key={i} regionName={regionName} detail={detail} ipcPreds={ipcPreds}/>
               ))
             }
             {
@@ -106,7 +160,7 @@ function MapView({detail, setDetail}) {
             }
           </svg>
       </div>
-      <DetailDrawer detail={detail} setDetail={setDetail}/>
+      <DetailDrawer detail={detail} setDetail={setDetail} ipcPreds={ipcPreds}/>
     </div>
   );
 }

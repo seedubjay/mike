@@ -136,13 +136,14 @@ function minVal(item) {
   return 0;
 }
 
+// found max values by going through clean data and using "df_conflict.groupby('Fatalities').max()" etc.
 function maxVal(item) {
-  if (item === "Temperature") return 110;
-  if (item.includes("Fatalities")) return 200;
-  if (item.includes("Maize")) return 10000;
-  if (item.includes("Rice")) return 10000;
-  if (item.includes("Sorghum")) return 10000;
-  if (item.includes("Cowpeas")) return 20000;
+  if (item === "Temperature") return 120; // max in clean is 109.6
+  if (item.includes("Fatalities")) return 700; // max in clean is 587
+  if (item.includes("Maize")) return 40000; // max in clean is 36600
+  if (item.includes("Rice")) return 30000; // max in clean is 25000, but max in raw is 60000
+  if (item.includes("Sorghum")) return 40000;
+  if (item.includes("Cowpeas")) return 100000; // max in clean is 80000
   return 100;
 }
 
