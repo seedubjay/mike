@@ -131,17 +131,18 @@ function SliderThumbComponents(props) {
   );
 }
 
-/**
- * Get the maximum value of a slider bar given the type of feature
- * @param  {String} item    The name of the feature
- * @return {Number}         The maximum value that slider can take
- */
+function minVal(item) {
+  if (item === "Temperature") return 30;
+  return 0;
+}
+
 function maxVal(item) {
-  if (item === "Temperature") return 50;
-  if (item.includes("Fatalities")) return 9999;
-  if (item.includes("Maize")) return 30;
-  if (item.includes("Rice")) return 60;
-  if (item.includes("Sorghum")) return 20;
+  if (item === "Temperature") return 110;
+  if (item.includes("Fatalities")) return 200;
+  if (item.includes("Maize")) return 10000;
+  if (item.includes("Rice")) return 10000;
+  if (item.includes("Sorghum")) return 10000;
+  if (item.includes("Cowpeas")) return 20000;
   return 100;
 }
 
@@ -165,7 +166,7 @@ function BarGraphInput({ datapoint, color, label, disabled, name, cb }) {
           style={{ "color": color }} //style={{"color":{color}}} doesn't work
           onChange={(_, v) => { setValue(v); cb(v); }}
           disabled={disabled}
-          min={0}
+          min={minVal(name)}
           max={maxVal(name)}
         />
       </Paper>
@@ -200,7 +201,7 @@ function GraphInput(props) {
 }
 
 function includeUnitsInTitle(title) {
-  if (title === "Temperature") return "Temperature: °C";
+  if (title === "Temperature") return "Temperature: °F";
   if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum")) return title + ": SOS per kg";
   return title;
 }
@@ -273,7 +274,7 @@ function ControlList({data, visible}) {
   );
 }
 
-function ControlView({region, setIsQuerying}) {
+function ControlView({region, isQuerying, setIsQuerying}) {
   const classes = useStyles();
 
   let [data, setData] = useState({});
@@ -341,7 +342,7 @@ function ControlView({region, setIsQuerying}) {
     <SplitPane split="horizontal" defaultSize="85%">
       <ControlList data={data} visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])}/>
       <div class={classes.root}>
-        <RecalculateView setIsQuerying={setIsQuerying} />
+        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
       </div>
     </SplitPane>
   );

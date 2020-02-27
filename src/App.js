@@ -28,12 +28,14 @@ function App() {
 
   const [isQuerying, setIsQuerying] = useState(false);
 
+
+
   return (
     <div className={classes.root}>
       
       <SplitPane split="vertical" defaultSize={650} primary="second">
         <MapView detail={detail} setDetail={setDetail}/>
-        <ControlView region={detail} setIsQuerying={setIsQuerying}/>
+        <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying}/>
       </SplitPane>
     </div>
   );
