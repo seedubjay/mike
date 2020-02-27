@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -13,7 +13,7 @@ import Grid from "@material-ui/core/Grid";
 import regionData from './regionData'
 import RecalculateView from './RecalculateView';
 
-const BAR_WIDTH = 20;
+const BAR_WIDTH = 17;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: 1,
   },
   paper: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
     textAlign: "center",
     color: theme.palette.text.secondary,
     height: "60%",
@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     width:{BAR_WIDTH},
     backgroundColor: 'transparent',
     boxShadow: 'none',
-    fontSize:11,
+    fontSize:10,
   },
 }));
 
@@ -110,7 +110,7 @@ const BarGraphSlider = withStyles({
     '$vertical &':{
       width:17,
       // change color to black when hovering
-      // TODO: fix this, doesn't work all the time
+      // TODO: fix this, doesn't work all the time because of the thumb element blocking
       "&$focusVisible,&:hover":{
         backgroundColor:"#000000",
       }
@@ -131,6 +131,11 @@ function SliderThumbComponents(props) {
   );
 }
 
+/**
+ * Get the maximum value of a slider bar given the type of feature
+ * @param  {String} item    The name of the feature
+ * @return {Number}         The maximum value that slider can take
+ */
 function maxVal(item) {
     if (item === "Temperature") return 50;
     if (item.includes("Fatalities")) return 9999;
@@ -156,7 +161,7 @@ function BarGraphInput({datapoint, color, label, disabled, name}) {
           orientation="vertical"
           valueLabelDisplay="auto"
           aria-label="bar graph slider"
-          defaultValue={value}
+          defaultValue={datapoint}
           style={{"color":color}} //style={{"color":{color}}} doesn't work
           onChange={(_,v) => {setValue(v)}}
           disabled={disabled}
@@ -177,6 +182,7 @@ function GraphInput(props){
   let i = 0;
 
   dataMap.forEach((datapoint, label)=>{
+    // only allows the most recent 6 entries to be editable
     if(i>(dataMap.size-6)-1){
       graphs.push(
         <BarGraphInput datapoint={datapoint} color={props.color} label={label} disabled={false} name={props.name}/>
@@ -190,47 +196,56 @@ function GraphInput(props){
     i++;
   });
 
-
   return (
     <div className={classes.root}>
-      <Grid container spacing={5}>
-        <Grid container item xs={12} spacing={0}>
+      <Grid container spacing={0}>
+        {/* <Grid container item xs={12} spacing={0}> */}
           {graphs}
-        </Grid>
+        {/* </Grid> */}
       </Grid>
     </div>
   );
 }
 
+function includeUnitsInTitle(title){
+  if (title === "Temperature") return "Temperature: °C";
+  if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum")) return title + ": SOS per kg";
+  return title;
+}
+
+const MONTH_MAP = new Map([
+  ["1", "Jan"],
+  ["2", "Feb"],
+  ["3", "Mar"],
+  ["4", "Apr"],
+  ["5", "May"],
+  ["6", "Jun"],
+  ["7", "Jul"],
+  ["8", "Aug"],
+  ["9", "Sep"],
+  ["10", "Oct"],
+  ["11", "Nov"],
+  ["12", "Dec"],
+]);
+
+// TODO: when linking with backend, use this to convert a year and month pair into a graph label
+function ConvertYearMonthToGraphLabel(year, month){
+  return MONTH_MAP.get(month) + "\'" + year.slice(-2);
+}
+
 function Dataset(props) {
   const classes = useStyles();
-
-  // test values for bar graphs
-  let dataMap = new Map([
-    ["Feb", 10],
-    ["Mar", 99],
-    ["Apr", 52],
-    ["May", 53],
-    ["Jun", 58],
-    ["Jul", 58],
-    ["Aug", 58],
-    ["Sep", 58],
-    ["Oct", 58],
-    ["Nov", 58],
-    ["Dec", 58],
-    ["Jan", 20],
-  ]);
 
   return (
       <ExpansionPanel className={classes.outerSettingsBox} style={{backgroundColor: props.backgroundColor}}>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
         >
-          <Typography className={classes.heading}>{props.name}</Typography>
+          <Typography className={classes.heading}>{includeUnitsInTitle(props.name)}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.innerSettingsBox}>
-            <GraphInput dataMap={dataMap} color={props.backgroundColor} name={props.name}/>
+            <GraphInput dataMap={props.dataMap} color={props.backgroundColor} name={props.name}/>
             {/* <SliderInput></SliderInput> */}
           </div>
         </ExpansionPanelDetails>
@@ -238,6 +253,8 @@ function Dataset(props) {
   )
 }
 
+
+// THIS ISN'T USED
 function SliderInput() {
   const classes = useStyles();
   return (
@@ -264,24 +281,51 @@ function chooseColor(item) {
     if (item.includes("Rice")) return "#85c785";
     if (item.includes("Sorghum")) return "orange";
     return "pink";
+}
+
+function getAllControls() {
+  var x = [];
+  for (var key of Object.keys(regionData)) { 
+      x = x.concat(regionData[key]);
+  }
+  x = x.filter((a,b) => x.indexOf(a) === b);
     
+  // test values for bar graphs
+  // TODO: Link to back end, such that you can get the data using the x 
+  // Examples of x: "Maize (white) - Borama | Awdal - Fatalities due to Conflict | ..."
+  let dataMap = new Map([
+    [ConvertYearMonthToGraphLabel("2019", "2"), 10],
+    ["Mar'19", 99],
+    ["Apr'19", 52],
+    ["May'19", 53],
+    ["Jun'19", 58],
+    ["Jul'19", 58],
+    ["Aug'19", 58],
+    ["Sep'19", 58],
+    ["Oct'19", 58],
+    ["Nov'19", 58],
+    ["Dec'19", 58],
+    ["Jan'20", 20],
+  ]);
+
+  var dict = {};
+  x.forEach(item => dict[item] = <Dataset dataMap={dataMap} backgroundColor={chooseColor(item)} name={item}/>)
+  return dict;
 }
 
 function ControlList(props) {
   const classes = useStyles();
+  
+  const allControls = getAllControls();
+  
+  var list;
   var controls = [];
   if (props.region == "") {
-      for (var key of Object.keys(regionData)) { 
-          controls = controls.concat(regionData[key]);
-      }
-      controls = controls.filter((a,b) => controls.indexOf(a) === b);
+      list = Object.values(allControls);
   } else {
-      controls = regionData[props.region];
+      list = Object.keys(allControls).filter(item => regionData[props.region].includes(item)).map(item => allControls[item]);
   }
-      var list;
-      if (Array.isArray(controls) && controls.length > 0){
-          list = controls.map((item, index) => <Dataset backgroundColor={chooseColor(item)} name={item}/>);
-      } 
+      
       return (
         <div className={classes.root}>
           <div className={classes.settingsList}>
@@ -295,6 +339,24 @@ function ControlList(props) {
 
   function ControlView(props) {
     const classes = useStyles();
+
+    let [data, setData] = useState([]);
+
+    useEffect(() => {
+      fetch("http://localhost:5000/data/all", {
+        crossDomain: true,
+        headers: {'Content-Type':'application/json'}
+      })
+        .then(res => res.json())
+        .then((result) => {
+          console.log(result);
+          let datasets = []
+          Object.keys(result["regions"]).map(region => {
+            console.log(result["regions"][region]);
+          })
+        })
+        .catch(console.log);
+    }, []);
 
     return (
       <SplitPane split="horizontal" defaultSize="85%">

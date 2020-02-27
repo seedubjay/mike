@@ -73,7 +73,7 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         if (detail == regionName || !availableRegions.includes(regionName)) {
           setDetail("");
         } else {
-            setDetail(regionName);          
+          setDetail(regionName);          
         }
       }}
       />
@@ -86,7 +86,7 @@ function MapView({detail, setDetail}) {
 
   return (
     <div className={classes.root}>
-      <div class={classes.title}>
+      <div className={classes.title}>
         <h1>Somalia</h1>
       </div>
       <div className={classes.mapView} onTap={() => {setDetail("");}}>
