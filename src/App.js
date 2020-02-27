@@ -53,9 +53,7 @@ function App() {
       
       <SplitPane split="vertical" defaultSize={650} primary="second">
         <MapView detail={detail} setDetail={setDetail}/>
-        <Store>
-          <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} setChangedValues={setChangedValues} />
-        </Store>
+        <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} setChangedValues={setChangedValues} />
       </SplitPane>
     </div>
   );
