@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
       "margin-right":20,
     },
     col40: {
-      flex: "40%",
+      flex: "30%",
       margin: 20,
     },
     col10: {
@@ -92,7 +92,7 @@ function LikelihoodStat({tier2, tier3, tier4}) {
 function Stats({details, name}) {
     return (
         <div>
-            <h3 padding={0}>{name}</h3>
+            <h3 padding={0}>{"Location: " + name}</h3>
             {details}
         </div>
     );
@@ -137,16 +137,7 @@ function DetailDrawer({detail, setDetail}) {
         animate={detail === "" ? "closed" : "open"}
         variants={drawerVariants}>
       
-        <div class={classes.row}>
-          <div class={classes.col99}>
-          </div>
-          <div class={classes.col1}>
-          {/* consider using ExpandMoreIcon directly rather than IconButton to appear less laggy */}
-          <IconButton aria-label="expand">
-            <ExpandMoreIcon onClick={() => {setDetail("");}}/>
-          </IconButton>
-          </div>
-        </div>
+        
         <div class={classes.row}>
           <div class={classes.col40}>
             {/* TODO: replace with actual data fetched from API. Assuming there are only 4 tiers as shown in Freddie's GitHub repo example */}
@@ -154,6 +145,12 @@ function DetailDrawer({detail, setDetail}) {
           </div>
           <div class={classes.col60}>
             <Stats details={details} name={detail}/>
+          </div>
+          <div class={classes.col1}>
+            {/* consider using ExpandMoreIcon directly rather than IconButton to appear less laggy */}
+            <IconButton aria-label="expand">
+              <ExpandMoreIcon onClick={() => {setDetail("");}}/>
+            </IconButton>
           </div>
         </div>
         
