@@ -80,10 +80,10 @@ function LikelihoodStat({ipcPredsForRegion}) {
     return (
         <div>
             <h3 padding={0}>{quartile + " Population Prediction"}</h3>
-            <h4 padding={0}>{"Phase 2: " + objectToStatistics(phase2)}</h4>
-            <h4 padding={0}>{"Phase 3: " + objectToStatistics(phase3)}</h4>
-            <h4 padding={0}>{"Phase 4: " + objectToStatistics(phase4)}</h4>
-            <h6>* 95% confidence interval</h6>
+            {["Phase 2: " + objectToStatistics(phase2),
+            "Phase 3: " + objectToStatistics(phase3),
+            "Phase 4: " + objectToStatistics(phase4)].map(a => <div><p>{a}</p></div>)}
+            <small>* 95% confidence interval</small>
         </div>
     );
 }
@@ -99,7 +99,7 @@ function Stats({details, name}) {
 
 const drawerVariants = {
     open: {
-      height: 200,
+      height: 250,
     },
     closed: {
       height: 0,
