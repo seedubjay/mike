@@ -45,12 +45,12 @@ function getRegionColour(ipcPreds, regionName) {
   let ipcSeverity;
   if (regionName in ipcPreds) {
     let ipcSpecificQuartilePreds = ipcPreds[regionName];
-    
+    let phase2, phase3, phase4;
     // normalise sum of phase probabilities
     if(!("normalised" in ipcSpecificQuartilePreds)) {
-      let phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
-      let phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
-      let phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
+      phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
+      phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
+      phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
       let sum = phase2 + phase3 + phase4;
       if (sum>1) {
         let scale = 1/sum;
@@ -69,10 +69,14 @@ function getRegionColour(ipcPreds, regionName) {
       ipcSpecificQuartilePreds["normalised"]=true;
     }
 
-    ipcSeverity = (ipcSpecificQuartilePreds["P3"]["mean"]*1 + ipcSpecificQuartilePreds["P4"]["mean"]*2) / 2;
+    phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
+    phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
+    phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
+
+    ipcSeverity = (phase2 + phase3*2 + phase4*3) / 3;
     
     const interpolate = require('color-interpolate');
-    let colorGradient = interpolate(['yellow', 'orange', 'red']);
+    let colorGradient = interpolate(['lightgreen','yellow', 'orange', 'red']);
     return colorGradient(ipcSeverity);
 
   } else {
@@ -81,14 +85,11 @@ function getRegionColour(ipcPreds, regionName) {
 }
 
 function RegionBackground({key, regionName, detail, colour}) {
-  // ipcSeverity is currently the proportion of people on IPC level 3 and above
-  // TODO: make it an interpolation of the official IPC level colours
-  
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
-      fill={colour} // previously "rgb(150,150,150)": "rgb(200,200,200)"
+      fill={colour}
       stroke="white"
       strokeWidth={2}
       />
@@ -140,7 +141,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
 
   const classes = useStyles();
 
-  const legendExplanation = "The colour of each region indicates the famine level from IPC Level 2 Borderline Food Insecure to IPC Level 4 Humanitarian Emergency";
+  const legendExplanation = "The colour of each region indicates the famine level from IPC Level 1 Generally Food Secure to IPC Level 4 Humanitarian Emergency";
 
   let [ipcPreds, setIPCPreds] = useState({});
 
@@ -175,7 +176,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
           if (err.name==TypeError){
             alert('error connecting with server');
           } else {
-            alert('error with loading data');
+            alert('error loading data');
           }
         }
         setIPCPreds(preds);
@@ -211,8 +212,8 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             <div>
               <span>IPC Level</span>
               <Rectangle aspectRatio={[25,4]}>
-                <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, yellow, orange, red)", width: "100%", height:"100%"}}>
-                    <span style={{marginLeft: 3}}>2</span>
+                <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, lightgreen, yellow, orange, red)", width: "100%", height:"100%"}}>
+                    <span style={{marginLeft: 3}}>1</span>
                     <span style={{marginRight: 3}}>4</span>
                 </div>
               </Rectangle>

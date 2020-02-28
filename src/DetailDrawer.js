@@ -77,13 +77,14 @@ function LikelihoodStat({ipcPredsForRegion}) {
             </div>);
   }
   let quartile = ipcPredsForRegion["quartile"];
-  // normalise sum of phase probabilities
   let phase2 = ipcPredsForRegion["P2"]['mean'];
   let phase3 = ipcPredsForRegion["P3"]['mean'];
   let phase4 = ipcPredsForRegion["P4"]['mean'];
 
   if(!("normalised" in ipcPredsForRegion)) {
     let sum = phase2 + phase3 + phase4;
+    // normalise probabilities if sum is more than 1, which may happen since probabilities are 
+    // predicted independently (for ease of understanding)
     if (sum>1) {
       let scale = 1/sum;
       for (let phase of ["P2", "P3", "P4"]){
