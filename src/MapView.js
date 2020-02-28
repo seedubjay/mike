@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import Rectangle from 'react-rectangle';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
 import regionData from './regionData';
@@ -31,6 +32,13 @@ const useStyles = makeStyles(theme => ({
   title: {
     margin: 5,
     marginLeft: 30,
+  },
+  legend: {
+    width: "22%",
+    marginRight: 25,
+    margin: 25,
+    marginLeft: "auto",
+    textAlign: "center",
   }
 }));
 
@@ -167,6 +175,15 @@ function MapView({detail, setDetail}) {
               ))
             }
           </svg>
+      </div>
+      <div class={classes.legend}>
+        <span>IPC Level</span>
+        <Rectangle aspectRatio={[25,4]}>
+          <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, yellow, orange, red)", width: "100%", height:"100%"}}>
+              <span style={{marginLeft: 3}}>2</span>
+              <span style={{marginRight: 3}}>4</span>
+          </div>
+        </Rectangle>
       </div>
       <DetailDrawer detail={detail} setDetail={setDetail} ipcPreds={ipcPreds}/>
     </div>
