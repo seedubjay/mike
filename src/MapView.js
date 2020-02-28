@@ -7,8 +7,6 @@ import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
 import regionData from './regionData';
 
-const availableRegions = Object.keys(regionData);
-
 const useStyles = makeStyles(theme => ({
   root: {
     width: "100%",
@@ -43,14 +41,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function RegionBackground({key, regionName, detail, ipcPreds}) {
-  // ipcSeverity is currently the proportion of people on IPC level 3 and above
-  // TODO: make it an interpolation of the official IPC level colours
+function getRegionColour(ipcPreds, regionName) {
   let ipcSeverity;
-  console.log(regionName, ipcPreds)
-  console.log(Object.keys(ipcPreds))
   if (regionName in ipcPreds) {
-    console.log("in ipc")
     let ipcSpecificQuartilePreds = ipcPreds[regionName];
     
     // normalise sum of phase probabilities
@@ -62,35 +55,34 @@ function RegionBackground({key, regionName, detail, ipcPreds}) {
     phase3 *= 1/sum;
     phase4 *= 1/sum;
 
-    ipcSeverity = (phase2*1 + 
-                    phase3*3 + 
-                    phase4*5) / 3
-  }
-  const interpolate = require('color-interpolate');
-  let colorGradient = interpolate(['yellow', 'orange', 'red']);
+    ipcSeverity = (phase2*1 + phase3*3 + phase4*5) / 3;
+    
+    const interpolate = require('color-interpolate');
+    let colorGradient = interpolate(['yellow', 'orange', 'red']);
+    return colorGradient(ipcSeverity);
 
-  let unSelectedColour;
-  if (ipcSeverity === undefined){
-    unSelectedColour = "Grey";
+  } else {
+    return "lightgray";
   }
-  else {
-    unSelectedColour = colorGradient(ipcSeverity);
-  }
+}
+
+function RegionBackground({key, regionName, detail, colour}) {
+  // ipcSeverity is currently the proportion of people on IPC level 3 and above
+  // TODO: make it an interpolation of the official IPC level colours
   
   return (
     <motion.path
       key={key}
       d={somaliaRegions[regionName]}
-      fill={detail === regionName ? "Black" : unSelectedColour} // previously "rgb(150,150,150)": "rgb(200,200,200)"
+      fill={colour} // previously "rgb(150,150,150)": "rgb(200,200,200)"
       stroke="white"
       strokeWidth={2}
       />
   )
 }
 
-function RegionHighlight({key, regionName, detail, setDetail}) {
+function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   const x = useMotionValue(0);
-  const c = useTransform(x, [0,1], [detail === regionName ? "rgb(150,150,150)" : "rgb(200,200,200)", "rgb(150,255,150)"]);
   const s = useTransform(x, [0,1], [1, 1.2]);
   const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
@@ -98,9 +90,9 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
       key={key}
       d={somaliaRegions[regionName]}
       style={{ x }}
-      fill={c}
+      fill={colour}
       stroke="white"
-      strokeWidth={0}
+      strokeWidth={2}
       scale={s}
       opacity={o}
       initial={{
@@ -112,7 +104,7 @@ function RegionHighlight({key, regionName, detail, setDetail}) {
         transition: {duration: 0.1}
       }}
       onTap={() => {
-        if (detail == regionName || !availableRegions.includes(regionName)) {
+        if (detail === regionName) {
           setDetail("");
         } else {
           setDetail(regionName);          
@@ -177,12 +169,12 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying }) {
             className={classes.mapSvg}>
             {
               Object.keys(somaliaRegions).map((regionName, i) => (
-                <RegionBackground key={i} regionName={regionName} detail={detail} ipcPreds={ipcPreds}/>
+                <RegionBackground key={i} regionName={regionName} detail={detail} colour={getRegionColour(ipcPreds, regionName)}/>
               ))
             }
             {
-              Object.keys(somaliaRegions).filter(regionName => availableRegions.includes(regionName)).map((regionName, i) => (
-                  <RegionHighlight key={i+200} regionName={regionName} detail={detail} setDetail={setDetail}/>
+              Object.keys(somaliaRegions).filter(regionName => regionName in ipcPreds).map((regionName, i) => (
+                <RegionHighlight key={i+200} regionName={regionName} detail={detail} setDetail={setDetail} colour={getRegionColour(ipcPreds, regionName)}/>
               ))
             }
           </svg>
