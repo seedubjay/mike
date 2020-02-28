@@ -73,24 +73,24 @@ function LikelihoodStat({ipcPredsForRegion}) {
   if(ipcPredsForRegion === undefined){
     return(<div></div>);
   }
-  let quartile = Object.keys(ipcPredsForRegion)[0];
+  let quartile = Object.keys(ipcPredsForRegion);
   // normalise sum of phase probabilities
-  let phase2 = ipcPredsForRegion[quartile]["P2"]['mean'];
-  let phase3 = ipcPredsForRegion[quartile]["P3"]['mean'];
-  let phase4 = ipcPredsForRegion[quartile]["P4"]['mean'];
+  let phase2 = ipcPredsForRegion["P2"]['mean'];
+  let phase3 = ipcPredsForRegion["P3"]['mean'];
+  let phase4 = ipcPredsForRegion["P4"]['mean'];
   let sum = phase2 + phase3 + phase4;
   phase2 *= 1/sum;
   phase3 *= 1/sum;
   phase4 *= 1/sum;
-  ipcPredsForRegion[quartile]["P2"]['mean'] = phase2;
-  ipcPredsForRegion[quartile]["P3"]['mean'] = phase3;
-  ipcPredsForRegion[quartile]["P4"]['mean'] = phase4;
+  ipcPredsForRegion["P2"]['mean'] = phase2;
+  ipcPredsForRegion["P3"]['mean'] = phase3;
+  ipcPredsForRegion["P4"]['mean'] = phase4;
     return (
         <div>
             <h3 padding={0}>{quartile + " Population Prediction"}</h3>
-            {["Phase 2: " + objectToStatistics(ipcPredsForRegion[quartile]["P2"]),
-            "Phase 3: " + objectToStatistics(ipcPredsForRegion[quartile]["P3"]),
-            "Phase 4: " + objectToStatistics(ipcPredsForRegion[quartile]["P4"])].map(a => <div><p>{a}</p></div>)}
+            {["Phase 2: " + objectToStatistics(ipcPredsForRegion["P2"]),
+            "Phase 3: " + objectToStatistics(ipcPredsForRegion["P3"]),
+            "Phase 4: " + objectToStatistics(ipcPredsForRegion["P4"])].map(a => <div><p>{a}</p></div>)}
             <small>* 95% confidence interval</small>
         </div>
     );

@@ -311,8 +311,6 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
               value_column = df.historical_data[name].columns.findIndex(x => x === "Price");
             }
             let lastData = df.historical_data[name].rows.map(row => row[date_column]).reduce((a,b) => Math.max(a,b));
-            console.log(df.historical_data[name].rows.map(row => row[date_column]));
-            console.log(lastData);
             
             let recent = df.historical_data[name].rows.sort((a, b) => a[date_column] - b[date_column]).slice(-6);
             let next = df.predicted_data[name].rows.filter(row => row[date_column] > lastData).sort((a, b) => a[date_column] - b[date_column]).slice(0,6);
@@ -334,8 +332,6 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
 
         setRegionFactors(rf);
         setData(datasets);
-
-        console.log(datasets);
       })
       .catch(console.log);
   }, []);

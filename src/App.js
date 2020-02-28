@@ -39,20 +39,11 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    if (isQuerying) {
-      // DO A QUERY WITH changedValues
-      console.log("QUERY");
-      console.log(changedValues.current);
-      setIsQuerying(false);
-    }
-  }, [isQuerying]);
-
   return (
     <div className={classes.root}>
       
       <SplitPane split="vertical" defaultSize={650} primary="second">
-        <MapView detail={detail} setDetail={setDetail}/>
+        <MapView detail={detail} setDetail={setDetail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
         <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} setChangedValues={setChangedValues} />
       </SplitPane>
     </div>

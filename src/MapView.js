@@ -38,8 +38,11 @@ function RegionBackground({key, regionName, detail, ipcPreds}) {
   // ipcSeverity is currently the proportion of people on IPC level 3 and above
   // TODO: make it an interpolation of the official IPC level colours
   let ipcSeverity;
-  if (regionName in ipcPreds){
-    let ipcSpecificQuartilePreds = ipcPreds[regionName][Object.keys(ipcPreds[regionName])[0]];
+  console.log(regionName, ipcPreds)
+  console.log(Object.keys(ipcPreds))
+  if (regionName in ipcPreds) {
+    console.log("in ipc")
+    let ipcSpecificQuartilePreds = ipcPreds[regionName];
     
     // normalise sum of phase probabilities
     let phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
@@ -115,7 +118,7 @@ function formatYearQuartileString(yearQuartileAPIString){
   return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
 }
 
-function MapView({detail, setDetail}) {
+function MapView({ detail, setDetail, isQuerying, setIsQuerying }) {
 
   const classes = useStyles();
 
@@ -123,28 +126,33 @@ function MapView({detail, setDetail}) {
 
   // TODO: allow the code to only fetch regional data on updates?
   useEffect(() => {
-    fetch("http://localhost:5000/prediction/summary", {
-      crossDomain: true,
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(res => res.json())
-      .then((result) => {
-        console.log(result);
-
-        let preds = {};
-
-        Object.keys(result["data"]).filter(region => result["data"][region].fitted).map(region => {
-          let df = result["data"][region]["data"];
-          let lastQuartilePredicted = Object.keys(df).reduce((a, b) => df[a] > df[b] ? a : b);
-          let lastQuartileString = formatYearQuartileString(lastQuartilePredicted);
-          preds[region] = {};
-          preds[region][lastQuartileString] = df[lastQuartilePredicted];
+    if (isQuerying) {
+      Promise.all(Object.keys(somaliaRegions).map(regionName => {
+        return fetch(`http://localhost:5000/prediction/region/${regionName}`, {
+          method: 'post',
+          crossDomain: true,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({changes: []}),
         })
-        console.log(preds);
+          .then(res => res.json())
+          .then((result) => {
+            if (!result.success) return [];
+            let df = result["data"];
+            let lastQuartilePredicted = Object.keys(df).reduce((a, b) => Math.max(a,b));
+            return [regionName, df[lastQuartilePredicted]]
+          })
+          .catch(console.log);
+      })).then((responses) => {
+        console.log(responses);
+        let preds = {}
+        responses.filter(resp => resp.length > 0).forEach(resp => {
+          preds[resp[0]] = resp[1]
+        })
         setIPCPreds(preds);
-      })
-      .catch(console.log);
-  }, []);
+        setIsQuerying(false);
+      });
+    }
+  }, [isQuerying]);
 
   return (
     <div className={classes.root}>
