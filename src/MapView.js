@@ -55,7 +55,7 @@ function getRegionColour(ipcPreds, regionName) {
     phase3 *= 1/sum;
     phase4 *= 1/sum;
 
-    ipcSeverity = (phase2*1 + phase3*3 + phase4*5) / 3;
+    ipcSeverity = (phase2*1 + phase3*3 + phase4*5) / 5;
     
     const interpolate = require('color-interpolate');
     let colorGradient = interpolate(['yellow', 'orange', 'red']);
@@ -114,7 +114,7 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   )
 }
 
-// e.g. "20201" becomes "2020Q1"
+// e.g. "20201" becomes "2020 Q1"
 function formatYearQuartileString(yearQuartileAPIString){
   return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
 }
