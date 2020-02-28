@@ -41,7 +41,7 @@ function RecalculateView({ isQuerying, setIsQuerying }) {
   };
 
   return (
-    <div class={classes.buttonContainer}>
+    <div className={classes.buttonContainer}>
       <div className={classes.placeholder}>
         <Fade
           in={!isQuerying}

@@ -206,7 +206,8 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
     console.log(ipcPreds);
 
     var details;
-    // TODO: is this still accurate? Or should we base this on the IPC predictions?
+    // TODO: not accurate! base this on the IPC predictions?
+    //
     if (typeof regionData[detail] !== "undefined") {
         details = regionData[detail].map(a => <div><p>{a}</p></div>);
     }

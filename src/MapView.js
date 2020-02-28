@@ -101,10 +101,25 @@ function RegionBackground({key, regionName, detail, colour}) {
   )
 }
 
+function shiftX(regionName) {
+    if (regionName === "Bakool") return -7;
+    if (regionName === "Lower Shabelle") return -8;
+    return 1;
+}
+
+function shiftY(regionName) {
+    if (regionName === "Lower Shabelle") return 3;
+    if (regionName === "Middle Juba") return 3;    
+    if (regionName === "Bakool") return 4;
+    if (regionName === "Woqooyi Galbeed") return 4;
+    if (regionName === "Sool") return -5;
+    if (regionName === "Mudug") return 3;
+    return 0;
+}
+
 function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   const x = useMotionValue(0);
   const s = useTransform(x, [0,1], [1, 1.2]);
-  const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
     <motion.path
       key={key}
@@ -113,15 +128,19 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
       fill={colour}
       stroke="white"
       strokeWidth={2}
-      scale={s}
-      opacity={o}
+      scale={1}
+      opacity={0}
       initial={{
         x:0,
         transition: {duration: 0},
       }}
       whileHover={{
-        x:1,
-        transition: {duration: 0.1}
+        rotate:regionName === "Woqooyi Galbeed" ? 1.3 : 0,
+        scale:regionName === "Banadir" ? 2 : 1.2,
+        opacity:1,
+        x:shiftX(regionName),
+        y:shiftY(regionName),          
+        transition: {duration: 0.1},
       }}
       onTap={() => {
         if (detail === regionName) {
@@ -146,7 +165,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
   useEffect(() => {
     if (isQuerying) {
       Promise.all(Object.keys(somaliaRegions).map(regionName => {
-        return fetch(`http://localhost:5000/prediction/region/${regionName}`, {
+        return fetch(`http://freddieposer.com:5000/prediction/region/${regionName}`, {
           method: 'post',
           crossDomain: true,
           headers: { 'Content-Type': 'application/json' },

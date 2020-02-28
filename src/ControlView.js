@@ -288,7 +288,7 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
   let [data, setData] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5000/data/all", {
+    fetch("http://freddieposer.com:5000/data/all", {
       crossDomain: true,
       headers: { 'Content-Type': 'application/json' }
     })
@@ -342,13 +342,21 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
       .catch(console.log);
   }, []);
 
+  if (region === "") {
+    return (
+    <ControlList
+      data={data}
+      visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
+    )
+  }
+
   return (
     <SplitPane split="horizontal" defaultSize="85%">
       <ControlList
         data={data}
         visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
-      <div class={classes.root}>
-        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
+      <div className={classes.root}>
+        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
       </div>
     </SplitPane>
   );
