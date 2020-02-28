@@ -277,12 +277,10 @@ function ControlList({data, visible}) {
   );
 }
 
-function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
+function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regionFactors, setRegionFactors }) {
   const classes = useStyles();
 
   let [data, setData] = useState({});
-
-  let [regionFactors, setRegionFactors] = useState({});
 
   useEffect(() => {
     fetch("http://localhost:5000/data/all", {
@@ -303,12 +301,15 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
             let date_column = df.historical_data[name].columns.findIndex(x => x === "Date");
             let year_column = df.historical_data[name].columns.findIndex(x => x === "Year");
             let month_column = df.historical_data[name].columns.findIndex(x => x === "Month");
-            var value_column = df.historical_data[name].columns.findIndex(x => x === "Temperature");
+            var value_column_name = "Temperature"
+            var value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
             if (value_column === -1) {
-              value_column = df.historical_data[name].columns.findIndex(x => x === "Fatalities");
+              value_column_name = "Fatalities"
+              value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
             }
             if (value_column === -1) {
-              value_column = df.historical_data[name].columns.findIndex(x => x === "Price");
+              value_column_name = "Price"
+              value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
             }
             let lastData = df.historical_data[name].rows.map(row => row[date_column]).reduce((a,b) => Math.max(a,b));
             
@@ -324,7 +325,7 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues}) {
               datasets[name].push({
                 label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
                 value: row[value_column],
-                cb: setChangedValues(name, row[year_column], row[month_column]),
+                cb: setChangedValues(name, row[year_column], row[month_column], value_column_name),
               }); 
             });
           })

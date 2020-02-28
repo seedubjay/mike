@@ -25,17 +25,18 @@ function App() {
   const classes = useStyles();
 
   const [detail, setDetail] = useState("");
-
   const [isQuerying, setIsQuerying] = useState(true);
+  let [regionFactors, setRegionFactors] = useState({});
 
-  const changedValues = useRef(new Map());
+  const changedValueSeen = useRef(new Set());
+  const changedValues = useRef([]);
 
-  function setChangedValues(name, year, month) {
+  function setChangedValues(source, year, month, column) {
     return v => {
-      console.log(name, year, month);
-      let k = `${name}_${year}_${month}`
-      if (k in changedValues) return;
-      changedValues.current.set(k, {name: name, year: year, month: month, value: v});
+      let k = `${source}_${year}_${month}`
+      if (changedValueSeen.current.has(k)) return;
+      changedValueSeen.current.add(k)
+      changedValues.current.push({source: source, year: year, month: month, column: column, value: v});
     }
   }
 
@@ -43,8 +44,8 @@ function App() {
     <div className={classes.root}>
       
       <SplitPane split="vertical" defaultSize={650} primary="second">
-        <MapView detail={detail} setDetail={setDetail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
-        <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} setChangedValues={setChangedValues} />
+        <MapView detail={detail} setDetail={setDetail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} changedValues={changedValues} regionFactors={regionFactors}/>
+        <ControlView region={detail} isQuerying={isQuerying} setIsQuerying={setIsQuerying} setChangedValues={setChangedValues} regionFactors={regionFactors} setRegionFactors={setRegionFactors} />
       </SplitPane>
     </div>
   );

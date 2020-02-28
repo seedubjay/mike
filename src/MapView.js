@@ -119,7 +119,7 @@ function formatYearQuartileString(yearQuartileAPIString){
   return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
 }
 
-function MapView({ detail, setDetail, isQuerying, setIsQuerying }) {
+function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, regionFactors }) {
 
   const classes = useStyles();
 
@@ -135,7 +135,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying }) {
           method: 'post',
           crossDomain: true,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({changes: []}),
+          body: JSON.stringify({changes: changedValues.current.filter(v => regionName in regionFactors && regionFactors[regionName].includes(v.source))}),
         })
           .then(res => res.json())
           .then((result) => {
