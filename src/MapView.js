@@ -3,6 +3,7 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Rectangle from 'react-rectangle';
 import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
 import regionData from './regionData';
@@ -188,7 +189,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
   return (
     <div className={classes.root}>
       <div className={classes.title}>
-        <h1>Somalia</h1>
+        <Typography variant="h3">Somalia</Typography>
       </div>
       <div className={classes.mapView} onTap={() => {setDetail("");}}>
           <svg
