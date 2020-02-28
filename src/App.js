@@ -26,7 +26,7 @@ function App() {
 
   const [detail, setDetail] = useState("");
 
-  const [isQuerying, setIsQuerying] = useState(false);
+  const [isQuerying, setIsQuerying] = useState(true);
 
   const changedValues = useRef(new Map());
 
