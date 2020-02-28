@@ -27,6 +27,9 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     maxHeight: "100%",
   },
+  info: {
+    margin: 10,
+  },
   outerSettingsBox: {
     marginTop: 15,
     marginBottom: 15,
@@ -263,8 +266,10 @@ function ControlList({data, visible}) {
   return (
     <div className={classes.root}>
       <div className={classes.settingsList}>
-        <h3>Data Simulation</h3>
-        <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
+        <div className={classes.info}>
+          <Typography gutterBottom="true" variant="h5">Data Simulation</Typography>
+          <Typography variant="body2">Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</Typography>
+        </div>
         {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
           <Dataset
             key={i}
