@@ -3,7 +3,7 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
-import regionData from './regionData'
+import regionData from './regionData';
 
 const availableRegions = Object.keys(regionData);
 
@@ -40,21 +40,29 @@ function RegionBackground({key, regionName, detail, ipcPreds}) {
   let ipcSeverity;
   if (regionName in ipcPreds){
     let ipcSpecificQuartilePreds = ipcPreds[regionName][Object.keys(ipcPreds[regionName])[0]];
-    ipcSeverity = ipcSpecificQuartilePreds["P2"]["mean"] + ipcSpecificQuartilePreds["P3"]["mean"];
+    
+    // normalise sum of phase probabilities
+    let phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
+    let phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
+    let phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
+    let sum = phase2 + phase3 + phase4;
+    phase2 *= 1/sum;
+    phase3 *= 1/sum;
+    phase4 *= 1/sum;
+
+    ipcSeverity = (phase2*1 + 
+                    phase3*3 + 
+                    phase4*5) / 3
   }
+  const interpolate = require('color-interpolate');
+  let colorGradient = interpolate(['yellow', 'orange', 'red']);
 
   let unSelectedColour;
   if (ipcSeverity === undefined){
     unSelectedColour = "Grey";
   }
-  else if (ipcSeverity < 0.1){
-    unSelectedColour = "LightPink";
-  }
-  else if (ipcSeverity < 0.5){
-    unSelectedColour = "Red";
-  }
   else {
-    unSelectedColour = "Maroon";
+    unSelectedColour = colorGradient(ipcSeverity);
   }
   
   return (
