@@ -31,6 +31,7 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     margin: 5,
+    marginTop: 10,
     marginLeft: 30,
   },
   legend: {
@@ -43,9 +44,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function getRegionColour(ipcPreds, regionName) {
+    
   let ipcSeverity;
   if (regionName in ipcPreds) {
-    let ipcSpecificQuartilePreds = ipcPreds[regionName];
+    let lastQuartile = Object.keys(ipcPreds[regionName]).reduce((a, b) => Math.max(a,b));
+    let ipcSpecificQuartilePreds = ipcPreds[regionName][lastQuartile];
     let phase2, phase3, phase4;
     // normalise sum of phase probabilities
     if(!("normalised" in ipcSpecificQuartilePreds)) {
@@ -83,6 +86,7 @@ function getRegionColour(ipcPreds, regionName) {
   } else {
     return "lightgray";
   }
+
 }
 
 function RegionBackground({key, regionName, detail, colour}) {
@@ -130,20 +134,12 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   )
 }
 
-// e.g. "20201" becomes "2020 Q1"
-function formatYearQuartileString(yearQuartileAPIString){
-  if (typeof yearQuartileAPIString !== "string"){
-    yearQuartileAPIString = yearQuartileAPIString.toString();
-  }
-  return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
-}
-
 function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, regionFactors }) {
 
   const classes = useStyles();
 
   const legendExplanation = "The colour of each region indicates the famine level from IPC Level 1 Generally Food Secure to IPC Level 4 Humanitarian Emergency";
-
+  
   let [ipcPreds, setIPCPreds] = useState({});
 
   // TODO: allow the code to only fetch regional data on updates?
@@ -161,9 +157,8 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             if (!result.success) return [];
             let df = result["data"];
             // TODO: include all quartiles, and draw line graph of predictions
-            let lastQuartilePredicted = Object.keys(df).reduce((a, b) => Math.max(a,b));
-            df[lastQuartilePredicted]["quartile"] = formatYearQuartileString(lastQuartilePredicted);
-            return [regionName, df[lastQuartilePredicted]];
+            let lastQuartile = Object.keys(df).reduce((a, b) => Math.max(a,b));
+            return [regionName, df];
           })
           .catch(console.log);
       })).then((responses) => {
