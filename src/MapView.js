@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Rectangle from 'react-rectangle';
+import Tooltip from '@material-ui/core/Tooltip';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
 import regionData from './regionData';
@@ -127,6 +128,8 @@ function MapView({detail, setDetail}) {
 
   const classes = useStyles();
 
+  const legendExplanation = "The colour of each region indicates the famine level from IPC Level 2 Borderline Food Insecure to IPC Level 4 Humanitarian Emergency";
+
   let [ipcPreds, setIPCPreds] = useState({});
 
   // TODO: allow the code to only fetch regional data on updates?
@@ -176,15 +179,19 @@ function MapView({detail, setDetail}) {
             }
           </svg>
       </div>
-      <div class={classes.legend}>
-        <span>IPC Level</span>
-        <Rectangle aspectRatio={[25,4]}>
-          <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, yellow, orange, red)", width: "100%", height:"100%"}}>
-              <span style={{marginLeft: 3}}>2</span>
-              <span style={{marginRight: 3}}>4</span>
-          </div>
-        </Rectangle>
-      </div>
+        <div class={classes.legend}>
+          <Tooltip title={legendExplanation} arrow>
+            <div>
+              <span>IPC Level</span>
+              <Rectangle aspectRatio={[25,4]}>
+                <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, yellow, orange, red)", width: "100%", height:"100%"}}>
+                    <span style={{marginLeft: 3}}>2</span>
+                    <span style={{marginRight: 3}}>4</span>
+                </div>
+              </Rectangle>
+            </div>
+          </Tooltip>
+        </div>
       <DetailDrawer detail={detail} setDetail={setDetail} ipcPreds={ipcPreds}/>
     </div>
   );
