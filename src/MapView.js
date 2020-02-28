@@ -6,7 +6,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
-import regionData from './regionData';
 
 const useStyles = makeStyles(theme => ({
   root: {

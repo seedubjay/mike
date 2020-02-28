@@ -3,7 +3,7 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import {makeStyles, Container, Typography} from '@material-ui/core';
+import {makeStyles, Container, Typography, Tooltip} from '@material-ui/core';
 import { Boxplot, computeBoxplotStats } from 'react-boxplot';
 import regionData from './regionData'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -48,10 +48,15 @@ const useStyles = makeStyles(theme => ({
     },
     row: {
       display: "flex",
+      justifyContent: "center",
+      width: "100%",
+      margin: 5,
     },
     col: {
       flex: "50%",
       margin: 20,
+      marginTop: "auto",
+      marginBottom: "auto",
     },
   }));
 
@@ -112,31 +117,32 @@ function QuartileStats({ipcPredsForRegion}) {
         //   "mean" : 0.25
         // },
     return (
-        <div>
+        <div style={{width: "100%"}}>
             {[["Phase 2", ipcPredsForRegion["P2"]],
             ["Phase 3", ipcPredsForRegion["P3"]],
             ["Phase 4", ipcPredsForRegion["P4"]]]
-            .map(data => <div class={classes.row}>
-                <div class={classes.col}>
-                  <p>{data[0] + ": " + convertFloatStringToPercent(data[1]["mean"]) + "%"}</p>
+            .map(data => 
+              <div class={classes.row}>
+                <div class={classes.col} style={{display: "flex", marginTop: "auto", marginBottom: "auto", justifyContent: "space-around", verticalAlign: "center"}}>
+                  <div style={{marginBottom: "auto", marginTop: "auto"}}><Typography variant="subtitle1">{data[0] + ":"}</Typography></div>
+                  <Typography variant="h5">{convertFloatStringToPercent(data[1]["mean"]) + "%"}</Typography>
                 </div>
-                <div class={classes.col}>
-                  <Boxplot
-                    width={150}
-                    height={20}
-                    orientation="horizontal"
-                    min={0}
-                    max={1}
-                    stats={{
-                      whiskerLow: data[1][95][0],
-                      quartile1: data[1][68][0],
-                      quartile2: data[1]["mean"],
-                      quartile3: data[1][68][1],
-                      whiskerHigh: data[1][95][1],
-                      outliers: [],
-                    }}
-                  />
-                  <small>Confidence Interval</small>
+                <div class={classes.col} style={{backgroundColor: "lightgray", padding: 10}}>
+                    <Boxplot
+                      width={150}
+                      height={20}
+                      orientation="horizontal"
+                      min={0}
+                      max={1}
+                      stats={{
+                        whiskerLow: data[1][95][0],
+                        quartile1: data[1][68][0],
+                        quartile2: data[1]["mean"],
+                        quartile3: data[1][68][1],
+                        whiskerHigh: data[1][95][1],
+                        outliers: [],
+                      }}
+                    />
                 </div>
               </div>)}
         </div>
