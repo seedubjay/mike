@@ -47,15 +47,29 @@ function getRegionColour(ipcPreds, regionName) {
     let ipcSpecificQuartilePreds = ipcPreds[regionName];
     
     // normalise sum of phase probabilities
-    let phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
-    let phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
-    let phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
-    let sum = phase2 + phase3 + phase4;
-    phase2 *= 1/sum;
-    phase3 *= 1/sum;
-    phase4 *= 1/sum;
+    if(!("normalised" in ipcSpecificQuartilePreds)) {
+      let phase2 = ipcSpecificQuartilePreds["P2"]["mean"];
+      let phase3 = ipcSpecificQuartilePreds["P3"]["mean"];
+      let phase4 = ipcSpecificQuartilePreds["P4"]["mean"];
+      let sum = phase2 + phase3 + phase4;
+      if (sum>1) {
+        let scale = 1/sum;
+        for (let phase of ["P2", "P3", "P4"]){
+          // some ugly handling of results being NaN
+          if(ipcSpecificQuartilePreds[phase]["mean"]==="NaN"){
+            return "lightgray";
+          }
+          ipcSpecificQuartilePreds[phase]["mean"] *= scale;
+          for(let ci of ["95", "68"]){
+            ipcSpecificQuartilePreds[phase][ci][0]*=scale;
+            ipcSpecificQuartilePreds[phase][ci][1]*=scale;
+          }
+        }
+      }
+      ipcSpecificQuartilePreds["normalised"]=true;
+    }
 
-    ipcSeverity = (phase2*1 + phase3*3 + phase4*5) / 5;
+    ipcSeverity = (ipcSpecificQuartilePreds["P3"]["mean"]*1 + ipcSpecificQuartilePreds["P4"]["mean"]*2) / 2;
     
     const interpolate = require('color-interpolate');
     let colorGradient = interpolate(['yellow', 'orange', 'red']);
@@ -116,6 +130,9 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
 
 // e.g. "20201" becomes "2020 Q1"
 function formatYearQuartileString(yearQuartileAPIString){
+  if (typeof yearQuartileAPIString !== "string"){
+    yearQuartileAPIString = yearQuartileAPIString.toString();
+  }
   return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
 }
 
@@ -141,16 +158,26 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
           .then((result) => {
             if (!result.success) return [];
             let df = result["data"];
+            // TODO: include all quartiles, and draw line graph of predictions
             let lastQuartilePredicted = Object.keys(df).reduce((a, b) => Math.max(a,b));
-            return [regionName, df[lastQuartilePredicted]]
+            df[lastQuartilePredicted]["quartile"] = formatYearQuartileString(lastQuartilePredicted);
+            return [regionName, df[lastQuartilePredicted]];
           })
           .catch(console.log);
       })).then((responses) => {
         console.log(responses);
         let preds = {}
-        responses.filter(resp => resp.length > 0).forEach(resp => {
-          preds[resp[0]] = resp[1]
-        })
+        try {
+          responses.filter(resp => resp.length > 0).forEach(resp => {
+            preds[resp[0]] = resp[1]
+          })
+        } catch (err){
+          if (err.name==TypeError){
+            alert('error connecting with server');
+          } else {
+            alert('error with loading data');
+          }
+        }
         setIPCPreds(preds);
         setIsQuerying(false);
       });

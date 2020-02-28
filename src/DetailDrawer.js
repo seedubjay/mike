@@ -71,20 +71,38 @@ function objectToStatistics (obj){
       // },
 function LikelihoodStat({ipcPredsForRegion}) {
   if(ipcPredsForRegion === undefined){
-    return(<div></div>);
+    return(<div>
+              <h3 padding={0}>{"Famine Population Prediction"}</h3>
+              <p>Data unavailable</p>
+            </div>);
   }
-  let quartile = Object.keys(ipcPredsForRegion);
+  let quartile = ipcPredsForRegion["quartile"];
   // normalise sum of phase probabilities
   let phase2 = ipcPredsForRegion["P2"]['mean'];
   let phase3 = ipcPredsForRegion["P3"]['mean'];
   let phase4 = ipcPredsForRegion["P4"]['mean'];
-  let sum = phase2 + phase3 + phase4;
-  phase2 *= 1/sum;
-  phase3 *= 1/sum;
-  phase4 *= 1/sum;
-  ipcPredsForRegion["P2"]['mean'] = phase2;
-  ipcPredsForRegion["P3"]['mean'] = phase3;
-  ipcPredsForRegion["P4"]['mean'] = phase4;
+
+  if(!("normalised" in ipcPredsForRegion)) {
+    let sum = phase2 + phase3 + phase4;
+    if (sum>1) {
+      let scale = 1/sum;
+      for (let phase of ["P2", "P3", "P4"]){
+        // some ugly handling of results being NaN
+        if(ipcPredsForRegion[phase]["mean"]==="NaN"){
+          return(<div>
+                    <h3 padding={0}>{"Famine Population Prediction"}</h3>
+                    <p>Data unavailable</p>
+                  </div>);
+        }
+        ipcPredsForRegion[phase]["mean"] *= scale;
+        for(let ci of ["95", "68"]){
+          ipcPredsForRegion[phase][ci][0]*=scale;
+          ipcPredsForRegion[phase][ci][1]*=scale;
+        }
+      }
+    }
+    ipcPredsForRegion["normalised"]=true;
+  }
     return (
         <div>
             <h3 padding={0}>{quartile + " Population Prediction"}</h3>
