@@ -86,7 +86,7 @@ const BarGraphSlider = withStyles({
     height: { BAR_WIDTH },
     width: { BAR_WIDTH },
     backgroundColor: "transparent",
-    left: 20, // cannot use BAR_WIDTH
+    left: 20, // BAR_WIDTH doesn't work
     // marginTop: -8,
     // marginLeft: -12,
     "&:focus,&:hover,&$active": {
@@ -150,7 +150,7 @@ function maxVal(item) {
 function BarGraphInput({ datapoint, color, label, disabled, name, cb }) {
   const classes = useStyles();
 
-  let [value, setValue] = useState(datapoint);
+  const [value, setValue] = useState(datapoint);
 
   return (
     <div>
@@ -187,11 +187,10 @@ function GraphInput(props) {
   return (
     <div className={classes.root}>
       <Grid container spacing={0}>
-        {/* <Grid container item xs={12} spacing={0}> */}
         {data.map((x,i) => (
           // only allows the most recent 6 entries to be editable
           <BarGraphInput
-            key={i}
+            key={i} // remove this?
             datapoint={Math.round(x.value)}
             color={i > (data.length - 6) - 1 ? props.color : "grey"}
             label={x.label}
@@ -199,7 +198,6 @@ function GraphInput(props) {
             name={props.name}
             cb={x.cb} />
         ))}
-        {/* </Grid> */}
       </Grid>
     </div>
   );
@@ -242,7 +240,7 @@ function Dataset(props) {
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <div className={classes.innerSettingsBox}>
-          <GraphInput data={props.data} color={props.backgroundColor} name={props.name} />
+          <GraphInput key={props.name} data={props.data} color={props.backgroundColor} name={props.name} />
         </div>
       </ExpansionPanelDetails>
     </ExpansionPanel>
@@ -259,6 +257,8 @@ function chooseColor(item) {
 }
 
 function ControlList({data, visible}) {
+  // data is feature:(array of {label:name value:v} objects) object
+  // visible is feature array
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -267,7 +267,6 @@ function ControlList({data, visible}) {
         <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
         {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
           <Dataset
-            key={i}
             data={data[k]}
             backgroundColor={chooseColor(k)}
             name={k} />
@@ -280,7 +279,7 @@ function ControlList({data, visible}) {
 function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regionFactors, setRegionFactors }) {
   const classes = useStyles();
 
-  let [data, setData] = useState({});
+  const [data, setData] = useState({});
 
   useEffect(() => {
     fetch("http://localhost:5000/data/all", {
@@ -294,13 +293,17 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
         let datasets = {}
         let rf = {}
         Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).map(region => {
+          // region specific
           let df = result["regions"][region]
           rf[region] = df.historical_data._feature_names
+          // filter the feature names that haven't been included?
           df.historical_data._feature_names.filter(name => !(name in datasets)).map(name => {
             datasets[name] = []
             let date_column = df.historical_data[name].columns.findIndex(x => x === "Date");
             let year_column = df.historical_data[name].columns.findIndex(x => x === "Year");
             let month_column = df.historical_data[name].columns.findIndex(x => x === "Month");
+            // go to the feature "name"
+            // we don't know if it's temperature, fatalities, or item type, so we try each
             var value_column_name = "Temperature"
             var value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
             if (value_column === -1) {
@@ -341,7 +344,10 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
     <SplitPane split="horizontal" defaultSize="85%">
       <ControlList
         data={data}
-        visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
+        // if no region set, return only Temperature
+        // else 
+          // if region name is in regionFactors, return index:feature array, else return empty array
+          visible={region === "" ? ["Temperature"] : (region in regionFactors ? regionFactors[region] : [])} />
       <div class={classes.root}>
         <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
       </div>
