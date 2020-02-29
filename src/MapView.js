@@ -3,9 +3,9 @@ import {makeStyles} from '@material-ui/core';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Rectangle from 'react-rectangle';
 import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
-import regionData from './regionData';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,6 +30,7 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     margin: 5,
+    marginTop: 10,
     marginLeft: 30,
   },
   legend: {
@@ -42,9 +43,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function getRegionColour(ipcPreds, regionName) {
+    
   let ipcSeverity;
   if (regionName in ipcPreds) {
-    let ipcSpecificQuartilePreds = ipcPreds[regionName];
+    let lastQuartile = Object.keys(ipcPreds[regionName]).reduce((a, b) => Math.max(a,b));
+    let ipcSpecificQuartilePreds = ipcPreds[regionName][lastQuartile];
     let phase2, phase3, phase4;
     // normalise sum of phase probabilities
     if(!("normalised" in ipcSpecificQuartilePreds)) {
@@ -82,6 +85,7 @@ function getRegionColour(ipcPreds, regionName) {
   } else {
     return "lightgray";
   }
+
 }
 
 function RegionBackground({key, regionName, detail, colour}) {
@@ -96,10 +100,25 @@ function RegionBackground({key, regionName, detail, colour}) {
   )
 }
 
+function shiftX(regionName) {
+    if (regionName === "Bakool") return -7;
+    if (regionName === "Lower Shabelle") return -8;
+    return 1;
+}
+
+function shiftY(regionName) {
+    if (regionName === "Lower Shabelle") return 3;
+    if (regionName === "Middle Juba") return 3;    
+    if (regionName === "Bakool") return 4;
+    if (regionName === "Woqooyi Galbeed") return 4;
+    if (regionName === "Sool") return -5;
+    if (regionName === "Mudug") return 3;
+    return 0;
+}
+
 function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   const x = useMotionValue(0);
   const s = useTransform(x, [0,1], [1, 1.2]);
-  const o = useTransform(x, i => i < 0.01 ? 0 : 1);
   return (
     <motion.path
       key={key}
@@ -108,15 +127,19 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
       fill={colour}
       stroke="white"
       strokeWidth={2}
-      scale={s}
-      opacity={o}
+      scale={1}
+      opacity={0}
       initial={{
         x:0,
         transition: {duration: 0},
       }}
       whileHover={{
-        x:1,
-        transition: {duration: 0.1}
+        rotate:regionName === "Woqooyi Galbeed" ? 1.3 : 0,
+        scale:regionName === "Banadir" ? 2 : 1.2,
+        opacity:1,
+        x:shiftX(regionName),
+        y:shiftY(regionName),          
+        transition: {duration: 0.1},
       }}
       onTap={() => {
         if (detail === regionName) {
@@ -129,27 +152,19 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   )
 }
 
-// e.g. "20201" becomes "2020 Q1"
-function formatYearQuartileString(yearQuartileAPIString){
-  if (typeof yearQuartileAPIString !== "string"){
-    yearQuartileAPIString = yearQuartileAPIString.toString();
-  }
-  return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
-}
-
 function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, regionFactors }) {
 
   const classes = useStyles();
 
   const legendExplanation = "The colour of each region indicates the famine level from IPC Level 1 Generally Food Secure to IPC Level 4 Humanitarian Emergency";
-
+  
   let [ipcPreds, setIPCPreds] = useState({});
 
   // TODO: allow the code to only fetch regional data on updates?
   useEffect(() => {
     if (isQuerying) {
       Promise.all(Object.keys(somaliaRegions).map(regionName => {
-        return fetch(`http://localhost:5000/prediction/region/${regionName}`, {
+        return fetch(`http://freddieposer.com:5000/prediction/region/${regionName}`, {
           method: 'post',
           crossDomain: true,
           headers: { 'Content-Type': 'application/json' },
@@ -160,9 +175,8 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             if (!result.success) return [];
             let df = result["data"];
             // TODO: include all quartiles, and draw line graph of predictions
-            let lastQuartilePredicted = Object.keys(df).reduce((a, b) => Math.max(a,b));
-            df[lastQuartilePredicted]["quartile"] = formatYearQuartileString(lastQuartilePredicted);
-            return [regionName, df[lastQuartilePredicted]];
+            let lastQuartile = Object.keys(df).reduce((a, b) => Math.max(a,b));
+            return [regionName, df];
           })
           .catch(console.log);
       })).then((responses) => {
@@ -188,7 +202,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
   return (
     <div className={classes.root}>
       <div className={classes.title}>
-        <h1>Somalia</h1>
+        <Typography variant="h3">Somalia</Typography>
       </div>
       <div className={classes.mapView} onTap={() => {setDetail("");}}>
           <svg

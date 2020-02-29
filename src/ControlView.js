@@ -27,6 +27,9 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     maxHeight: "100%",
   },
+  info: {
+    margin: 10,
+  },
   outerSettingsBox: {
     marginTop: 15,
     marginBottom: 15,
@@ -263,8 +266,10 @@ function ControlList({data, visible}) {
   return (
     <div className={classes.root}>
       <div className={classes.settingsList}>
-        <h3>Data Simulation</h3>
-        <p>Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</p>
+        <div className={classes.info}>
+          <Typography gutterBottom="true" variant="h5">Data Simulation</Typography>
+          <Typography variant="body2">Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</Typography>
+        </div>
         {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
           <Dataset
             data={data[k]}
@@ -282,7 +287,7 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
   const [data, setData] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5000/data/all", {
+    fetch("http://freddieposer.com:5000/data/all", {
       crossDomain: true,
       headers: { 'Content-Type': 'application/json' }
     })
@@ -340,6 +345,14 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
       .catch(console.log);
   }, []);
 
+  if (region === "") {
+    return (
+    <ControlList
+      data={data}
+      visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
+    )
+  }
+
   return (
     <SplitPane split="horizontal" defaultSize="85%">
       <ControlList
@@ -348,8 +361,8 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
         // else 
           // if region name is in regionFactors, return index:feature array, else return empty array
           visible={region === "" ? ["Temperature"] : (region in regionFactors ? regionFactors[region] : [])} />
-      <div class={classes.root}>
-        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} />
+      <div className={classes.root}>
+        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
       </div>
     </SplitPane>
   );
