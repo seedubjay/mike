@@ -345,27 +345,27 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
       .catch(console.log);
   }, []);
 
+  // if no region set, return only Temperature
   if (region === "") {
     return (
     <ControlList
       data={data}
-      visible={region === "" ? Object.keys(data) : (region in regionFactors ? regionFactors[region] : [])} />
+      visible={["Temperature"]} />
     )
   }
-
-  return (
-    <SplitPane split="horizontal" defaultSize="85%">
-      <ControlList
-        data={data}
-        // if no region set, return only Temperature
-        // else 
-          // if region name is in regionFactors, return index:feature array, else return empty array
-          visible={region === "" ? ["Temperature"] : (region in regionFactors ? regionFactors[region] : [])} />
-      <div className={classes.root}>
-        <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
-      </div>
-    </SplitPane>
-  );
+  else {
+    return (
+      <SplitPane split="horizontal" defaultSize="85%">
+        <ControlList
+          data={data}
+            // if region name is in regionFactors, return region-specific feature array, else return empty array
+            visible={region in regionFactors ? regionFactors[region] : []} />
+        <div className={classes.root}>
+          <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
+        </div>
+      </SplitPane>
+    );
+  }
 }
 
 
