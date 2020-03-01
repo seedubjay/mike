@@ -128,7 +128,6 @@ function shiftY(regionName) {
 
 function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   const x = useMotionValue(0);
-  const s = useTransform(x, [0,1], [1, 1.2]);
   return (
     <motion.path
       key={key}
@@ -184,13 +183,10 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
           .then((result) => {
             if (!result.success) return [];
             let df = result["data"];
-            // TODO: include all quartiles, and draw line graph of predictions
-            let lastQuartile = Object.keys(df).reduce((a, b) => Math.max(a,b));
             return [regionName, df];
           })
           .catch(console.log);
       })).then((responses) => {
-        console.log(responses);
         let preds = {}
         try {
           responses.filter(resp => resp.length > 0).forEach(resp => {
@@ -231,8 +227,8 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             }
           </svg>
       </div>
-        <div class={classes.row}>
-          <div class={classes.col} style={{display: "flex", justifyContent: "left"}}>
+        <div className={classes.row}>
+          <div className={classes.col} style={{display: "flex", justifyContent: "left"}}>
             <div style={{width: "9%"}}>
               <Rectangle aspectRatio={[10,6]}>
                 <div style={{background: "lightgray", width: "100%", height:"100%"}}>
@@ -241,7 +237,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             </div>
             <Typography variant="body2">   - Regions with Insufficient Data</Typography>
           </div>
-          <div class={classes.legend}>
+          <div className={classes.legend}>
             <Tooltip title={legendExplanation} arrow>
               <div>
                 <span>IPC Level</span>

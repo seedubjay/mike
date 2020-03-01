@@ -301,7 +301,7 @@ function ControlList({data, visible}) {
     <div className={classes.root}>
       <div className={classes.settingsList}>
         <div className={classes.info}>
-          <Typography gutterBottom="true" variant="h5">Data Simulation</Typography>
+          <Typography gutterBottom={true} variant="h5">Data Simulation</Typography>
           <Typography variant="body2">Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</Typography>
         </div>
         {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
@@ -327,8 +327,6 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
     })
       .then(res => res.json())
       .then((result) => {
-        console.log(result);
-
         let datasets = {}
         let rf = {}
         Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).map(region => {

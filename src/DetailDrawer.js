@@ -123,12 +123,12 @@ function QuartileStats({ipcPredsForRegion, minCI, maxCI}) {
             ["Phase 3", ipcPredsForRegion["P3"]],
             ["Phase 4", ipcPredsForRegion["P4"]]]
             .map(data => 
-              <div class={classes.row}>
-                <div class={classes.col} style={{display: "flex", marginTop: "auto", marginBottom: "auto", justifyContent: "space-around", verticalAlign: "center"}}>
+              <div className={classes.row}>
+                <div className={classes.col} style={{display: "flex", marginTop: "auto", marginBottom: "auto", justifyContent: "space-around", verticalAlign: "center"}}>
                   <div style={{marginBottom: "auto", marginTop: "auto"}}><Typography variant="subtitle1">{data[0] + ":"}</Typography></div>
                   <Typography variant="h5">{convertFloatStringToPercent(data[1]["mean"]) + "%"}</Typography>
                 </div>
-                <div class={classes.col}>
+                <div className={classes.col}>
                   <div style={{backgroundColor: "lightgray", padding: 10, width: 170}}>
                     <Boxplot
                       width={150}
@@ -189,9 +189,6 @@ function LikelihoodStats({ipcPredsForRegion}) {
       }
     }
   }
-
-  console.log(minCI);
-  console.log(maxCI);
   
   return (
     <div>
@@ -244,7 +241,7 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
         animate={detail === "" ? "closed" : "open"}
         variants={drawerVariants}>
       
-        <div class={classes.header}>
+        <div className={classes.header}>
           <div style={{marginTop: 20}}>
             <Typography variant="h5">{detail}</Typography>
           </div>
@@ -252,7 +249,7 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
                 <ExpandMoreIcon onClick={() => {setDetail("");}}/>
           </IconButton>
         </div>
-        <div class={classes.body}>
+        <div className={classes.body}>
           <QuartileGraph></QuartileGraph>
           <LikelihoodStats ipcPredsForRegion={ipcPreds[detail]}/>
         </div>
