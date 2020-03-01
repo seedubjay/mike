@@ -8,6 +8,7 @@ import { Boxplot } from 'react-boxplot';
 import regionData from './regionData'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
+import Chart from 'react-apexcharts';
 
 
 const useStyles = makeStyles(theme => ({
@@ -206,18 +207,101 @@ function LikelihoodStats({ipcPredsForRegion}) {
   );
 }
 
-function QuartileGraph() {
+
+function QuartileGraph({ipcPredsForRegion}) {
   //TODO: MAKE THE GRAPH!!!
+  
+  if(ipcPredsForRegion === undefined) {
+    return null;
+  }
+  
+  const options = {
+    title : {
+      text : "Predictions of Phases 2 - 4 with 95% confidence intervals",
+      align: "center"
+    },
+    chart : {
+      type : "line",
+      toolbar : {
+        show : false,
+      },
+      animations : {
+        animateGradually : {
+          enabled : false,
+        },
+      },
+    },
+    xaxis : {
+      categories : Object.keys(ipcPredsForRegion).map(quarter => quarter.substring(0,4) + " Q" + quarter.substring(4))
+    },
+    yaxis : {
+      min : 0,
+      max : 1,
+      forceNiceScale : true,
+      decimalsInFloat: 1,
+    },
+    colors : ["#ffff00", "#ffa500", "#ff0000"],
+    stroke : {
+      width : [3,3,3,2,2,2,2,2,2],
+      dashArray: [0,0,0,1,1,1,1,1,1],
+    },
+    tooltip : {
+      enabled : false,
+    },
+    legend : {
+      show : false,
+    },
+  };
+  
+  const series = [{
+      name : "Phase 2",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["mean"]),
+    },
+    {
+      name : "Phase 3",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["mean"]),
+    },
+    {
+      name : "Phase 4",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["mean"]),
+    },
+    {
+      name : "Phase 2",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][0]),
+    },
+    {
+      name : "Phase 3",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][0]),
+    },
+    {
+      name : "Phase 4",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["95"][0]),
+    },
+    {
+      name : "Phase 2",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][1]),
+    },
+    {
+      name : "Phase 3",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][1]),
+    },
+    {
+      name : "Phase 4",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["95"][1]),
+    },
+  ];
+  
   return (
-    <div style={{width: 300, height: 200, backgroundColor: "darkgray", marginLeft: "auto", marginRight: "auto", marginBottom: 20}}>
-      <Typography variant="h6">Graph Here</Typography>
+    <div style={{width: 400, backgroundColor: "darkgray", marginLeft: "auto", marginRight: "auto", marginBottom: 20}}>
+    <Chart options={options} series={series} type="line" width="400"/>
+           
     </div>
   );
 }
 
 const drawerVariants = {
     open: {
-      height: 250,
+      height: 350,
     },
     closed: {
       height: 0,
@@ -250,7 +334,7 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
           </IconButton>
         </div>
         <div className={classes.body}>
-          <QuartileGraph></QuartileGraph>
+          <QuartileGraph ipcPredsForRegion={ipcPreds[detail]}></QuartileGraph>
           <LikelihoodStats ipcPredsForRegion={ipcPreds[detail]}/>
         </div>
       </motion.div>
