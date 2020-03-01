@@ -72,7 +72,7 @@ function formatYearQuartileString(yearQuartileAPIString){
   return yearQuartileAPIString.slice(0,4) + " Q" + yearQuartileAPIString.slice(yearQuartileAPIString.length-1);
 }
 
-function QuartileStats({ipcPredsForRegion}) {
+function QuartileStats({ipcPredsForRegion, minCI, maxCI}) {
   const classes = useStyles();
 
   if(ipcPredsForRegion === undefined){
@@ -101,6 +101,7 @@ function QuartileStats({ipcPredsForRegion}) {
                   </div>);
         }
         ipcPredsForRegion[phase]["mean"] *= scale;
+
         for(let ci of ["95", "68"]){
           ipcPredsForRegion[phase][ci][0]*=scale;
           ipcPredsForRegion[phase][ci][1]*=scale;
@@ -127,13 +128,14 @@ function QuartileStats({ipcPredsForRegion}) {
                   <div style={{marginBottom: "auto", marginTop: "auto"}}><Typography variant="subtitle1">{data[0] + ":"}</Typography></div>
                   <Typography variant="h5">{convertFloatStringToPercent(data[1]["mean"]) + "%"}</Typography>
                 </div>
-                <div class={classes.col} style={{backgroundColor: "lightgray", padding: 10}}>
+                <div class={classes.col}>
+                  <div style={{backgroundColor: "lightgray", padding: 10, width: 170}}>
                     <Boxplot
                       width={150}
                       height={20}
                       orientation="horizontal"
-                      min={0}
-                      max={1}
+                      min={minCI}
+                      max={maxCI}
                       stats={{
                         whiskerLow: data[1][95][0],
                         quartile1: data[1][68][0],
@@ -143,6 +145,7 @@ function QuartileStats({ipcPredsForRegion}) {
                         outliers: [],
                       }}
                     />
+                  </div>
                 </div>
               </div>)}
         </div>
@@ -170,16 +173,35 @@ function LikelihoodStats({ipcPredsForRegion}) {
       </ExpansionPanel>
     );
   }
+
+  var minCI = 10000000;
+  var maxCI = 0;
+
+  //find min and max 95% CI to format boxplots
+  for (let quarter of Object.keys(ipcPredsForRegion)) {
+    for (let phase of ["P2", "P3", "P4"]) {
+      if (ipcPredsForRegion[quarter][phase][95][0] < minCI) {
+        minCI = ipcPredsForRegion[quarter][phase][95][0];
+      }
+
+      if (ipcPredsForRegion[quarter][phase][95][1] > maxCI) {
+        maxCI = ipcPredsForRegion[quarter][phase][95][1];
+      }
+    }
+  }
+
+  console.log(minCI);
+  console.log(maxCI);
   
   return (
     <div>
-      {Object.keys(ipcPredsForRegion).map(quartile => 
+      {Object.keys(ipcPredsForRegion).map(quarter => 
         <ExpansionPanel square className={classes.panel}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>{formatYearQuartileString(quartile) + " Population Prediction"}</Typography>
+            <Typography>{formatYearQuartileString(quarter) + " Population Prediction"}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <QuartileStats ipcPredsForRegion={ipcPredsForRegion[quartile]}></QuartileStats>
+            <QuartileStats ipcPredsForRegion={ipcPredsForRegion[quarter]} minCI={minCI} maxCI={maxCI}></QuartileStats>
           </ExpansionPanelDetails>
         </ExpansionPanel>
     )}
@@ -208,8 +230,6 @@ const drawerVariants = {
 function DetailDrawer({detail, setDetail, ipcPreds}) {
 
     const classes = useStyles();
-  
-    console.log(ipcPreds);
 
     var details;
     // TODO: not accurate! base this on the IPC predictions?
