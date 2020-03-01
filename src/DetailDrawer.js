@@ -209,7 +209,6 @@ function LikelihoodStats({ipcPredsForRegion}) {
 
 
 function QuartileGraph({ipcPredsForRegion}) {
-  //TODO: MAKE THE GRAPH!!!
   
   if(ipcPredsForRegion === undefined) {
     return null;
@@ -240,22 +239,42 @@ function QuartileGraph({ipcPredsForRegion}) {
       forceNiceScale : true,
       decimalsInFloat: 1,
     },
-    colors : ["#ffff00", "#ffa500", "#ff0000"],
+    colors : ["#ffff00","#ffff00","#ffff00", "#ffa500","#ffa500","#ffa500", "#ff0000", "#ff0000", "#ff0000"],
     stroke : {
-      width : [3,3,3,2,2,2,2,2,2],
-      dashArray: [0,0,0,1,1,1,1,1,1],
+      width : [2,2,4,2,2,4,2,2,4],
+      dashArray: [1,1,0,1,1,0,1,1,0],
     },
     tooltip : {
       enabled : false,
     },
     legend : {
-      show : false,
+      show : true,
+      formatter: function(seriesName, opts) {
+        return [(opts.seriesIndex % 3 === 2) ? seriesName : ""]
+      },
     },
   };
   
-  const series = [{
+  const series = [
+    {
+      name : "Phase 2",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][0]),
+    },
+    {
+      name : "Phase 2",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][1]),
+    },
+    {
       name : "Phase 2",
       data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["mean"]),
+    },
+    {
+      name : "Phase 3",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][0]),
+    },
+    {
+      name : "Phase 3",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][1]),
     },
     {
       name : "Phase 3",
@@ -263,38 +282,21 @@ function QuartileGraph({ipcPredsForRegion}) {
     },
     {
       name : "Phase 4",
-      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["mean"]),
-    },
-    {
-      name : "Phase 2",
-      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][0]),
-    },
-    {
-      name : "Phase 3",
-      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][0]),
-    },
-    {
-      name : "Phase 4",
       data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["95"][0]),
-    },
-    {
-      name : "Phase 2",
-      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P2"]["95"][1]),
-    },
-    {
-      name : "Phase 3",
-      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P3"]["95"][1]),
     },
     {
       name : "Phase 4",
       data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["95"][1]),
+    },
+    {
+      name : "Phase 4",
+      data : Object.values(ipcPredsForRegion).map(quarter => quarter["P4"]["mean"]),
     },
   ];
   
   return (
     <div style={{width: 400, backgroundColor: "darkgray", marginLeft: "auto", marginRight: "auto", marginBottom: 20}}>
     <Chart options={options} series={series} type="line" width="400"/>
-           
     </div>
   );
 }
