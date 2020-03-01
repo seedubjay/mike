@@ -22,10 +22,11 @@ const useStyles = makeStyles(theme => ({
   col: {
     height: "100%",
     flex: "50%",
-    alignContent: "center",
     textAlign: "center",
     float: "none",
     display: "inline-block",
+    marginTop: "auto",
+    marginBottom: "auto",
   }
 }));
 
