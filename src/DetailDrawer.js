@@ -209,7 +209,7 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
 
     const classes = useStyles();
   
-    console.log(ipcPreds);
+    //console.log(ipcPreds);
 
     var details;
     // TODO: not accurate! base this on the IPC predictions?

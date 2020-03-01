@@ -33,7 +33,7 @@ function handleClick() {
 
 }
 
-function RecalculateView({ isQuerying, setIsQuerying, region }) {
+function RecalculateView({ isQuerying, setIsQuerying, region, initReady }) {
   const classes = useStyles();
 
   const handleClick = () => {
@@ -44,7 +44,7 @@ function RecalculateView({ isQuerying, setIsQuerying, region }) {
     <div className={classes.buttonContainer}>
       <div className={classes.placeholder}>
         <Fade
-          in={!isQuerying}
+          in={!isQuerying && initReady}
           style={{
             transitionDelay: isQuerying ? '1ms' : '0ms',
           }}
@@ -53,7 +53,7 @@ function RecalculateView({ isQuerying, setIsQuerying, region }) {
           <Button variant="contained" onClick={handleClick}>{"Run Model for " + ((region === "") ? "Somalia" : region)}</Button>
         </Fade>
         <Fade
-          in={isQuerying}
+          in={isQuerying || !initReady}
           style={{
             transitionDelay: isQuerying ? '800ms' : '0ms',
           }}
