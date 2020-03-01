@@ -37,9 +37,19 @@ const useStyles = makeStyles(theme => ({
     width: "22%",
     marginRight: 25,
     margin: 25,
-    marginLeft: "auto",
     textAlign: "center",
-  }
+  },
+  row: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    margin: 5,
+  },
+  col: {
+    margin: 20,
+    marginTop: "auto",
+    width: "60%",
+  },
 }));
 
 function getRegionColour(ipcPreds, regionName) {
@@ -221,18 +231,29 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             }
           </svg>
       </div>
-        <div class={classes.legend}>
-          <Tooltip title={legendExplanation} arrow>
-            <div>
-              <span>IPC Level</span>
-              <Rectangle aspectRatio={[25,4]}>
-                <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, lightgreen, yellow, orange, red)", width: "100%", height:"100%"}}>
-                    <span style={{marginLeft: 3}}>1</span>
-                    <span style={{marginRight: 3}}>4</span>
+        <div class={classes.row}>
+          <div class={classes.col} style={{display: "flex", justifyContent: "left"}}>
+            <div style={{width: "9%"}}>
+              <Rectangle aspectRatio={[10,6]}>
+                <div style={{background: "lightgray", width: "100%", height:"100%"}}>
                 </div>
               </Rectangle>
             </div>
-          </Tooltip>
+            <Typography variant="body2">   - Regions with Insufficient Data</Typography>
+          </div>
+          <div class={classes.legend}>
+            <Tooltip title={legendExplanation} arrow>
+              <div>
+                <span>IPC Level</span>
+                <Rectangle aspectRatio={[25,4]}>
+                  <div style={{display: "flex", justifyContent: "space-between", background: "linear-gradient(0.25turn, lightgreen, yellow, orange, red)", width: "100%", height:"100%"}}>
+                      <span style={{marginLeft: 3}}>1</span>
+                      <span style={{marginRight: 3}}>4</span>
+                  </div>
+                </Rectangle>
+              </div>
+            </Tooltip>
+          </div>
         </div>
       <DetailDrawer detail={detail} setDetail={setDetail} ipcPreds={ipcPreds}/>
     </div>
