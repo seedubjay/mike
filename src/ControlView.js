@@ -211,7 +211,7 @@ function GraphInput(props) {
 
 function includeUnitsInTitle(title) {
   if (title === "Temperature") return "Temperature: °F";
-  if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum")) return title + ": SOS per kg";
+  if (title.includes("Maize") || title.includes("Rice") || title.includes("Sorghum") || title.includes("Cowpeas")) return title + ": SOS per kg";
   return title;
 }
 
@@ -285,7 +285,7 @@ function NoRegionView({ isQuerying }) {
           unmountOnExit
         >
           <div className={classes.centeredBox} style={{padding: 80}}>
-            <Typography>Select a region on the map to the right to load up the data and start running some simulations</Typography>
+            <Typography>Select a region on the map to the left to load up the data and start running some simulations</Typography>
           </div>
         </Fade>
     </div>
