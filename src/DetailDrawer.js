@@ -2,9 +2,9 @@ import React from 'react';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import {makeStyles, Container, Typography, Tooltip} from '@material-ui/core';
-import { Boxplot, computeBoxplotStats } from 'react-boxplot';
+import { motion } from "framer-motion";
+import {makeStyles, Typography} from '@material-ui/core';
+import { Boxplot } from 'react-boxplot';
 import regionData from './regionData'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
@@ -81,7 +81,7 @@ function QuartileStats({ipcPredsForRegion}) {
               <p>Data unavailable</p>
             </div>);
   }
-  let quartile = ipcPredsForRegion["quartile"];
+  
   let phase2 = ipcPredsForRegion["P2"]['mean'];
   let phase3 = ipcPredsForRegion["P3"]['mean'];
   let phase4 = ipcPredsForRegion["P4"]['mean'];

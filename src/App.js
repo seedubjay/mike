@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
-import SplitPane, { Pane } from 'react-split-pane';
-import { Slider, makeStyles } from '@material-ui/core';
+import SplitPane from 'react-split-pane';
+import { makeStyles } from '@material-ui/core';
 import './App.css';
 
 import MapView from './MapView';

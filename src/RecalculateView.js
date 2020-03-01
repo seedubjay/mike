@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fade from '@material-ui/core/Fade';
-import { makeStyles, Container } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   buttonContainer: {
@@ -28,10 +28,6 @@ const useStyles = makeStyles(theme => ({
     display: "inline-block",
   }
 }));
-
-function handleClick() {
-
-}
 
 function RecalculateView({ isQuerying, setIsQuerying, region }) {
   const classes = useStyles();

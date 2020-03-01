@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Text, Slider, makeStyles, withStyles } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import { Slider, makeStyles, withStyles, CircularProgress } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
+import Fade from '@material-ui/core/Fade';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { getThemeProps } from '@material-ui/styles';
-import { inheritInnerComments } from '@babel/types';
-import SplitPane, { Pane } from 'react-split-pane';
+import SplitPane from 'react-split-pane';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import regionData from './regionData'
 import RecalculateView from './RecalculateView';
 
 const BAR_WIDTH = 17;
@@ -21,6 +19,11 @@ const useStyles = makeStyles(theme => ({
     height: "100%",
     display: 'flex',
     width: "100%",
+  },
+  centeredBox: {
+    textAlign: "center",
+    margin: "auto",
+    padding: 20,
   },
   settingsList: {
     padding: 10,
@@ -228,7 +231,7 @@ const MONTH_MAP = new Map([
 ]);
 
 function ConvertYearMonthToGraphLabel(year, month) {
-  return MONTH_MAP.get(month) + "\'" + year.slice(-2);
+  return MONTH_MAP.get(month) + "'" + year.slice(-2);
 }
 
 function Dataset(props) {
@@ -259,10 +262,41 @@ function chooseColor(item) {
   return "pink";
 }
 
+function NoRegionView({ isQuerying }) {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.root}>
+      <Fade
+          in={isQuerying}
+          unmountOnExit
+        >
+        <div className={classes.centeredBox}>
+          <div className={classes.info}>
+            <CircularProgress />
+          </div>
+          <div className={classes.info}>
+            <Typography>Loading Data ...</Typography>
+          </div>
+        </div>
+      </Fade>
+      <Fade
+          in={!isQuerying}
+          unmountOnExit
+        >
+          <div className={classes.centeredBox} style={{padding: 80}}>
+            <Typography>Select a region on the map to the right to load up the data and start running some simulations</Typography>
+          </div>
+        </Fade>
+    </div>
+  );
+}
+
 function ControlList({data, visible}) {
   // data is feature:(array of {label:name value:v} objects) object
   // visible is feature array
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <div className={classes.settingsList}>
@@ -345,12 +379,10 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
       .catch(console.log);
   }, []);
 
-  // if no region set, return only Temperature
+  // if no region set, tell user what to do
   if (region === "") {
     return (
-    <ControlList
-      data={data}
-      visible={["Temperature"]} />
+    <NoRegionView isQuerying={isQuerying}/>
     )
   }
   else {
