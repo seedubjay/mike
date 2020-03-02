@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core';
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 import Rectangle from 'react-rectangle';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
@@ -98,10 +98,9 @@ function getRegionColour(ipcPreds, regionName) {
 
 }
 
-function RegionBackground({key, regionName, detail, colour}) {
+function RegionBackground({regionName, colour}) {
   return (
     <motion.path
-      key={key}
       d={somaliaRegions[regionName]}
       fill={colour}
       stroke="white"
@@ -126,11 +125,10 @@ function shiftY(regionName) {
     return 0;
 }
 
-function RegionHighlight({key, regionName, detail, setDetail, colour}) {
+function RegionHighlight({regionName, detail, setDetail, colour}) {
   const x = useMotionValue(0);
   return (
     <motion.path
-      key={key}
       d={somaliaRegions[regionName]}
       style={{ x }}
       fill={colour}
@@ -169,9 +167,12 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
   
   let [ipcPreds, setIPCPreds] = useState({});
 
+  let [fetching, setFetching] = useState(false);
+
   // TODO: allow the code to only fetch regional data on updates?
   useEffect(() => {
-    if (isQuerying) {
+    if (isQuerying && !fetching) {
+      setFetching(true);
       Promise.all(Object.keys(somaliaRegions).map(regionName => {
         return fetch(`http://freddieposer.com:5000/prediction/region/${regionName}`, {
           method: 'post',
@@ -193,7 +194,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
             preds[resp[0]] = resp[1]
           })
         } catch (err){
-          if (err.name==TypeError){
+          if (err.name===TypeError){
             alert('error connecting with server');
           } else {
             alert('error loading data');
@@ -201,16 +202,17 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
         }
         setIPCPreds(preds);
         setIsQuerying(false);
+        setFetching(false);
       });
     }
-  }, [isQuerying]);
+  });
 
   return (
     <div className={classes.root}>
       <div className={classes.title}>
         <Typography variant="h3">Somalia</Typography>
       </div>
-      <div className={classes.mapView} onTap={() => {setDetail("");}}>
+      <div className={classes.mapView} >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1051.004 1338"

@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 
 import SplitPane from 'react-split-pane';
 import { makeStyles } from '@material-ui/core';
-import './App.css';
 
 import MapView from './MapView';
 import ControlView from './ControlView';

@@ -5,7 +5,6 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { motion } from "framer-motion";
 import {makeStyles, Typography} from '@material-ui/core';
 import { Boxplot } from 'react-boxplot';
-import regionData from './regionData'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import Chart from 'react-apexcharts';
@@ -313,13 +312,6 @@ const drawerVariants = {
 function DetailDrawer({detail, setDetail, ipcPreds}) {
 
     const classes = useStyles();
-
-    var details;
-    // TODO: not accurate! base this on the IPC predictions?
-    //
-    if (typeof regionData[detail] !== "undefined") {
-        details = regionData[detail].map(a => <div><p>{a}</p></div>);
-    }
 
     return (
       <motion.div

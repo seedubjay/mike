@@ -329,12 +329,12 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
       .then((result) => {
         let datasets = {}
         let rf = {}
-        Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).map(region => {
+        Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).forEach(region => {
           // region specific
           let df = result["regions"][region]
           rf[region] = df.historical_data._feature_names
           // filter the feature names that haven't been included?
-          df.historical_data._feature_names.filter(name => !(name in datasets)).map(name => {
+          df.historical_data._feature_names.filter(name => !(name in datasets)).forEach(name => {
             datasets[name] = []
             let date_column = df.historical_data[name].columns.findIndex(x => x === "Date");
             let year_column = df.historical_data[name].columns.findIndex(x => x === "Year");
@@ -355,13 +355,13 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
             
             let recent = df.historical_data[name].rows.sort((a, b) => a[date_column] - b[date_column]).slice(-6);
             let next = df.predicted_data[name].rows.filter(row => row[date_column] > lastData).sort((a, b) => a[date_column] - b[date_column]).slice(0,6);
-            recent.map(row => {
+            recent.forEach(row => {
               datasets[name].push({
                 label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
                 value: row[value_column],
               });
             });
-            next.map(row => {
+            next.forEach(row => {
               datasets[name].push({
                 label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
                 value: row[value_column],
@@ -375,7 +375,7 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
         setData(datasets);
       })
       .catch(console.log);
-  }, []);
+  }, [setChangedValues, setRegionFactors, setData]);
 
   // if no region set, tell user what to do
   if (region === "") {
