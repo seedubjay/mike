@@ -34,8 +34,9 @@ const useStyles = makeStyles(theme => ({
     header: {
       display: "flex",
       justifyContent: "space-between",
+      marginTop: 5,
       marginLeft: 20,
-      marginRight: 20,
+      marginRight: 5,
     },
     body: {
       padding: 10,
@@ -216,7 +217,10 @@ function QuartileGraph({ipcPredsForRegion}) {
   const options = {
     title : {
       text : "Predictions of Phases 2 - 4 with 95% confidence intervals",
-      align: "center"
+      align: "center",
+      style:{
+        fontSize: "12px",
+      }
     },
     chart : {
       type : "line",
@@ -295,7 +299,7 @@ function QuartileGraph({ipcPredsForRegion}) {
   
   return (
     <div style={{width: 400, backgroundColor: "darkgray", marginLeft: "auto", marginRight: "auto", marginBottom: 20}}>
-    <Chart options={options} series={series} type="line" width="400"/>
+    <Chart options={options} series={series} type="line" width="400" height="200"/>
     </div>
   );
 }
@@ -323,9 +327,11 @@ function DetailDrawer({detail, setDetail, ipcPreds}) {
           <div style={{marginTop: 20}}>
             <Typography variant="h5">{detail}</Typography>
           </div>
-          <IconButton aria-label="expand">
+          {/* <div style={{flex: "1%", "margin-top": 20, "margin-right":20,}}> */}
+            <IconButton aria-label="expand">
                 <ExpandMoreIcon onClick={() => {setDetail("");}}/>
-          </IconButton>
+            </IconButton>
+          {/* </div> */}
         </div>
         <div className={classes.body}>
           <QuartileGraph ipcPredsForRegion={ipcPreds[detail]}></QuartileGraph>
