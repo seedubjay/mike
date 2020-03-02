@@ -10,6 +10,7 @@ import SplitPane from 'react-split-pane';
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import RecalculateView from './RecalculateView';
+import { API_ENDPOINT } from './config';
 
 const BAR_WIDTH = 17;
 
@@ -153,56 +154,64 @@ function maxVal(item) {
   return 100;
 }
 
-function BarGraphInput({ datapoint, color, label, disabled, name, cb }) {
+function BarGraphInput({ datapoint, color, label, disabled, name, cb ,visible}) {
   const classes = useStyles();
 
   const [value, setValue] = useState(datapoint);
-
-  return (
-    <div>
-      <Paper className={classes.label}>
-        {value}
-      </Paper>
-      <Paper className={classes.paper}>
-        <BarGraphSlider
-          ThumbComponent={SliderThumbComponents}
-          orientation="vertical"
-          valueLabelDisplay="auto"
-          aria-label="bar graph slider"
-          defaultValue={datapoint}
-          style={{ "color": color }} //style={{"color":{color}}} doesn't work
-          onChange={(_, v) => {
-            setValue(v);
-            cb(v);
-          }}
-          disabled={disabled}
-          min={minVal(name)}
-          max={maxVal(name)}
-        />
-      </Paper>
-      <Paper className={classes.label}>{label}</Paper>
-    </div>
-  );
+  
+  if(visible){
+      return (
+        <div>
+          <Paper className={classes.label}>
+            {value}
+          </Paper>
+          <Paper className={classes.paper}>
+            <BarGraphSlider
+              ThumbComponent={SliderThumbComponents}
+              orientation="vertical"
+              valueLabelDisplay="auto"
+              aria-label="bar graph slider"
+              value={value}
+              style={{ "color": color }}
+              onChange={(_, v) => {
+                setValue(v);
+                cb(v);
+              }}
+              disabled={disabled}
+              min={minVal(name)}
+              max={maxVal(name)}
+            />
+          </Paper>
+          <Paper className={classes.label}>{label}</Paper>
+        </div>
+      );
+  } else {
+    return null
+  }
 }
 
 // creates vertical sliders with labels (e.g. for adjusting rainfall)
 function GraphInput(props) {
+  
   const classes = useStyles();
   let data = props.data;
-
   return (
     <div className={classes.root}>
       <Grid container spacing={0}>
         {data.map((x,i) => (
           // only allows the most recent 6 entries to be editable
+          
           <BarGraphInput
             key={i} // remove this?
             datapoint={Math.round(x.value)}
-            color={i > (data.length - 6) - 1 ? props.color : "grey"}
+            //color={i > (data.length - 6) - 1 ? props.color : "grey"}
+            color = {"cb" in x? props.color:"grey"}
             label={x.label}
-            disabled={i <= (data.length - 6) - 1}
+            //disabled={i <= (data.length - 6) - 1}
+            disabled = {!("cb" in x)}
             name={props.name}
-            cb={x.cb} />
+            cb={x.cb}
+            visible = {props.name !== "Temperature" || (i >= 6 && props.isRecent) || (i < 12 && !props.isRecent)}/>
         ))}
       </Grid>
     </div>
@@ -236,7 +245,7 @@ function ConvertYearMonthToGraphLabel(year, month) {
 
 function Dataset(props) {
   const classes = useStyles();
-
+  
   return (
     <ExpansionPanel className={classes.outerSettingsBox} style={{ backgroundColor: props.backgroundColor }}>
       <ExpansionPanelSummary
@@ -246,7 +255,7 @@ function Dataset(props) {
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <div className={classes.innerSettingsBox}>
-          <GraphInput key={props.name} data={props.data} color={props.backgroundColor} name={props.name} />
+          <GraphInput key={props.name} data={props.data} color={props.backgroundColor} name={props.name} isRecent={props.isRecent}/>
         </div>
       </ExpansionPanelDetails>
     </ExpansionPanel>
@@ -292,7 +301,7 @@ function NoRegionView({ isQuerying }) {
   );
 }
 
-function ControlList({data, visible}) {
+function ControlList({data,tempData, visible, isRecent, initReady}) {
   // data is feature:(array of {label:name value:v} objects) object
   // visible is feature array
   const classes = useStyles();
@@ -304,75 +313,128 @@ function ControlList({data, visible}) {
           <Typography gutterBottom={true} variant="h5">Data Simulation</Typography>
           <Typography variant="body2">Adjust the data for the following year to simulate different scenarios and see the impact it has on the famine likelihood.</Typography>
         </div>
-        {Object.keys(data).filter(k => visible.includes(k)).map((k,i) => (
+        {(tempData!=[] && initReady) ? 
+        <Dataset
+            data = {tempData}
+            backgroundColor = {chooseColor("Temperature")}
+            name={"Temperature"}
+            isRecent = {isRecent} />
+          : null }
+        {(data && initReady) ? Object.keys(data).map((k,i) => (
           <Dataset
+            key={i+1}
             data={data[k]}
             backgroundColor={chooseColor(k)}
-            name={k} />
-        ))}
+            name={k}
+            isRecent = {isRecent} />
+        )) : null}
       </div>
     </div>
   );
 }
 
-function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regionFactors, setRegionFactors }) {
+function ControlView({region, isQuerying, setIsQuerying, setChangedValues, setDataReady, initReady}) {
   const classes = useStyles();
 
   const [data, setData] = useState({});
-
+  const [tempData, setTempData] = useState([]);
+  const [isRecent, setIsRecent] = useState({});
+  
   useEffect(() => {
-    fetch("http://freddieposer.com:5000/data/all", {
+    fetch(`http://${API_ENDPOINT}:5000/data/all`, {
       crossDomain: true,
       headers: { 'Content-Type': 'application/json' }
     })
       .then(res => res.json())
       .then((result) => {
         let datasets = {}
-        let rf = {}
+        let tempDataInit = false
+        let tempData = []
+        let isRecentObject = {}
         Object.keys(result["regions"]).filter(region => result["regions"][region].fitted).map(region => {
           // region specific
           let df = result["regions"][region]
-          rf[region] = df.historical_data._feature_names
-          // filter the feature names that haven't been included?
-          df.historical_data._feature_names.filter(name => !(name in datasets)).map(name => {
-            datasets[name] = []
-            let date_column = df.historical_data[name].columns.findIndex(x => x === "Date");
-            let year_column = df.historical_data[name].columns.findIndex(x => x === "Year");
-            let month_column = df.historical_data[name].columns.findIndex(x => x === "Month");
-            // go to the feature "name"
-            // we don't know if it's temperature, fatalities, or item type, so we try each
-            var value_column_name = "Temperature"
-            var value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
-            if (value_column === -1) {
-              value_column_name = "Fatalities"
-              value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
-            }
-            if (value_column === -1) {
-              value_column_name = "Price"
-              value_column = df.historical_data[name].columns.findIndex(x => x === value_column_name);
-            }
-            let lastData = df.historical_data[name].rows.map(row => row[date_column]).reduce((a,b) => Math.max(a,b));
+          let region_dataset = {}
+          
+          let most_recent_quarter = df.historical_data._end_quarter
+          let most_recent_year = df.historical_data._end_year
+          isRecentObject[region] = (most_recent_quarter == 4 && most_recent_year==2019)
+          
+          df.historical_data._feature_names.forEach((name, i)=>{
             
-            let recent = df.historical_data[name].rows.sort((a, b) => a[date_column] - b[date_column]).slice(-6);
-            let next = df.predicted_data[name].rows.filter(row => row[date_column] > lastData).sort((a, b) => a[date_column] - b[date_column]).slice(0,6);
-            recent.map(row => {
-              datasets[name].push({
-                label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
-                value: row[value_column],
-              });
-            });
-            next.map(row => {
-              datasets[name].push({
-                label: ConvertYearMonthToGraphLabel(row[year_column].toString(), row[month_column].toString()),
-                value: row[value_column],
-                cb: setChangedValues(name, row[year_column], row[month_column], value_column_name),
-              }); 
-            });
+            let hist_df = df.historical_data[name]
+            let value_column_name = df.historical_data._value_columns[name]
+            
+            let hist_feat_cols = hist_df.columns
+            let hist_date_column = hist_feat_cols.findIndex(x => x === "Date");
+            let hist_year_column = hist_feat_cols.findIndex(x => x === "Year");
+            let hist_month_column = hist_feat_cols.findIndex(x => x === "Month");
+            let hist_value_column = hist_feat_cols.findIndex(x => x === value_column_name)
+            
+            let hist_rows = hist_df.rows.sort((a,b) => a[hist_date_column] > b[hist_date_column]).slice(-6)
+            let last_date = hist_rows[hist_rows.length-1][hist_date_column]
+            
+
+            let pred_df = df.predicted_data[name]
+            let pred_feat_cols = pred_df.columns
+            let pred_date_column = pred_feat_cols.findIndex(x=> x === "Date");
+            let pred_year_column = pred_feat_cols.findIndex(x=> x === "Year");
+            let pred_month_column = pred_feat_cols.findIndex(x=> x === "Month");
+            let pred_value_column = pred_feat_cols.findIndex(x => x === value_column_name)
+            let pred_rows = pred_df.rows.filter(row => row[pred_date_column] > last_date)
+                                        .sort((a,b) => a[pred_date_column] > b[pred_date_column]).slice(0,6)
+            
+            if(name === "Temperature"){
+              if(!tempDataInit && most_recent_quarter == 4 && most_recent_year == 2019){
+                hist_rows = hist_df.rows.sort((a,b) => a[hist_date_column] > b[hist_date_column]).slice(-12)
+                pred_rows = pred_df.rows.filter(row => row[pred_date_column] > last_date)
+                                            .sort((a,b) => a[pred_date_column] > b[pred_date_column]).slice(0,6)
+                tempData = 
+                  hist_rows.map(row => {
+                    return {
+                      label: ConvertYearMonthToGraphLabel(row[hist_year_column].toString(), row[hist_month_column].toString()),
+                      value: row[hist_value_column]
+                    }
+                  }).concat(
+                    pred_rows.map(row => {
+                      return {
+                        label: ConvertYearMonthToGraphLabel(row[pred_year_column].toString(), row[pred_month_column].toString()),
+                        value: row[pred_value_column],
+                        cb: setChangedValues(name, row[pred_year_column], row[pred_month_column], value_column_name, ""),
+                      }
+                    })
+                  )
+                tempDataInit = true
+              }
+              return  
+            }
+            
+            
+            
+            region_dataset[name] = 
+              hist_rows.map(row => {
+                return {
+                  label: ConvertYearMonthToGraphLabel(row[hist_year_column].toString(), row[hist_month_column].toString()),
+                  value: row[hist_value_column]
+                }
+              }).concat(
+                pred_rows.map(row => {
+                  return {
+                    label: ConvertYearMonthToGraphLabel(row[pred_year_column].toString(), row[pred_month_column].toString()),
+                    value: row[pred_value_column],
+                    cb: setChangedValues(name, row[pred_year_column], row[pred_month_column], value_column_name, region),
+                  }
+                })
+              )
+            
           })
+          datasets[region] = region_dataset
         })
 
-        setRegionFactors(rf);
         setData(datasets);
+        setTempData(tempData)
+        setIsRecent(isRecentObject)
+        setDataReady(true)
       })
       .catch(console.log);
   }, []);
@@ -386,17 +448,19 @@ function ControlView({region, isQuerying, setIsQuerying, setChangedValues, regio
   else {
     return (
       <SplitPane split="horizontal" defaultSize="85%">
+        
         <ControlList
-          data={data}
-            // if region name is in regionFactors, return region-specific feature array, else return empty array
-            visible={region in regionFactors ? regionFactors[region] : []} />
+          data={region === "" ? null:data[region]}
+          isRecent = {region === "" || isRecent[region]}
+          tempData = {tempData}
+          initReady = {initReady}
+        />
         <div className={classes.root}>
-          <RecalculateView isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
+          <RecalculateView initReady={initReady} isQuerying={isQuerying} setIsQuerying={setIsQuerying} region={region}/>
         </div>
       </SplitPane>
     );
   }
 }
-
 
 export default ControlView;

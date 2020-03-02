@@ -6,7 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import somaliaRegions from './regions.json';
 import DetailDrawer from './DetailDrawer';
-
+import {API_ENDPOINT} from './config';
 const useStyles = makeStyles(theme => ({
   root: {
     width: "100%",
@@ -104,8 +104,8 @@ function RegionBackground({key, regionName, detail, colour}) {
       key={key}
       d={somaliaRegions[regionName]}
       fill={colour}
-      stroke="white"
-      strokeWidth={2}
+      stroke={(detail !== regionName || detail === "")? "white" : "black"}
+      strokeWidth={detail === regionName ? 5 : 2}
       />
   )
 }
@@ -134,7 +134,7 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
       d={somaliaRegions[regionName]}
       style={{ x }}
       fill={colour}
-      stroke="white"
+      stroke={detail === regionName ? "white" : "grey"}
       strokeWidth={2}
       scale={1}
       opacity={0}
@@ -161,7 +161,7 @@ function RegionHighlight({key, regionName, detail, setDetail, colour}) {
   )
 }
 
-function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, regionFactors }) {
+function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, regionFactors, changedValuesObject, setPredReady }) {
 
   const classes = useStyles();
 
@@ -171,13 +171,16 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
 
   // TODO: allow the code to only fetch regional data on updates?
   useEffect(() => {
+    
     if (isQuerying) {
-      Promise.all(Object.keys(somaliaRegions).map(regionName => {
-        return fetch(`http://freddieposer.com:5000/prediction/region/${regionName}`, {
+      console.log(changedValuesObject.current)
+      Promise.all(Object.keys(changedValuesObject.current).map(regionName => {
+        console.log(JSON.stringify({changes: Object.values(changedValuesObject.current[regionName])}))
+        return fetch(`http://${API_ENDPOINT}:5000/prediction/region/${regionName}`, {
           method: 'post',
           crossDomain: true,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({changes: changedValues.current.filter(v => regionName in regionFactors && regionFactors[regionName].includes(v.source))}),
+          body: JSON.stringify({changes: Object.values(changedValuesObject.current[regionName])}),
         })
           .then(res => res.json())
           .then((result) => {
@@ -187,7 +190,8 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
           })
           .catch(console.log);
       })).then((responses) => {
-        let preds = {}
+        console.log(responses);
+        let preds = ipcPreds
         try {
           responses.filter(resp => resp.length > 0).forEach(resp => {
             preds[resp[0]] = resp[1]
@@ -204,7 +208,28 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
       });
     }
   }, [isQuerying]);
-
+  useEffect(()=>{
+    fetch(`http://${API_ENDPOINT}:5000/prediction/summary`, {
+      crossDomain: true,
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then((result) => {
+        if(!result.success) {
+          alert("Error loading data")
+        } else {
+          let df = result.data
+          let preds = {}
+          Object.keys(df).filter(x => df[x].fitted).forEach((regionName, i)=>{
+            preds[regionName] = df[regionName].data
+          })
+          setIPCPreds(preds)
+          setPredReady(true)
+        }
+        
+      })
+      .catch(console.log)
+  },[])
   return (
     <div className={classes.root}>
       <div className={classes.title}>
@@ -235,7 +260,7 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValues, 
                 </div>
               </Rectangle>
             </div>
-            <Typography variant="body2">   - Regions with Insufficient Data</Typography>
+            <Typography variant="body2">&nbsp; Regions with Insufficient Data</Typography>
           </div>
           <div className={classes.legend}>
             <Tooltip title={legendExplanation} arrow>

@@ -1,0 +1,1 @@
+export let API_ENDPOINT = "freddieposer.com";
