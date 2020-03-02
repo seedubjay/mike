@@ -78,24 +78,12 @@ const BarGraphSlider = withStyles({
     color: "currentColor",
     height: 8,
     width: 8,
-    // TODO: do something when hovering over the bar graph
-    // good with detecting hovering, but can't find a way to change the ui that is graphically appealing
-    "&$focusVisible,&:hover": {
-      // borderColor:'black',
-      // borderRadius:3,
-      // backgroundColor:"#000000",
-      // color:"#000000",
-      // boxShadow: "inherit"
-      // border: `1px solid ${theme.palette.divider}`,
-    },
   },
   thumb: {
     height: { BAR_WIDTH },
     width: { BAR_WIDTH },
     backgroundColor: "transparent",
-    left: 20, // BAR_WIDTH doesn't work
-    // marginTop: -8,
-    // marginLeft: -12,
+    left: 20,
     "&:focus,&:hover,&$active": {
       boxShadow: "inherit"
     },
@@ -117,7 +105,6 @@ const BarGraphSlider = withStyles({
     '$vertical &': {
       width: 17,
       // change color to black when hovering
-      // TODO: fix this, doesn't work all the time because of the thumb element blocking
       "&$focusVisible,&:hover": {
         backgroundColor: "#000000",
       }
@@ -200,14 +187,11 @@ function GraphInput(props) {
       <Grid container spacing={0}>
         {data.map((x,i) => (
           // only allows the most recent 6 entries to be editable
-          
           <BarGraphInput
-            key={i} // remove this?
+            key={i} 
             datapoint={Math.round(x.value)}
-            //color={i > (data.length - 6) - 1 ? props.color : "grey"}
             color = {"cb" in x? props.color:"grey"}
             label={x.label}
-            //disabled={i <= (data.length - 6) - 1}
             disabled = {!("cb" in x)}
             name={props.name}
             cb={x.cb}
@@ -301,9 +285,7 @@ function NoRegionView({ isQuerying }) {
   );
 }
 
-function ControlList({data,tempData, visible, isRecent, initReady}) {
-  // data is feature:(array of {label:name value:v} objects) object
-  // visible is feature array
+function ControlList({data,tempData, isRecent, initReady}) {
   const classes = useStyles();
 
   return (
