@@ -68,7 +68,6 @@ function getRegionColour(ipcPreds, regionName) {
       if (sum>1) {
         let scale = 1/sum;
         for (let phase of ["P2", "P3", "P4"]){
-          // some ugly handling of results being NaN
           if(ipcSpecificQuartilePreds[phase]["mean"]==="NaN"){
             return "lightgray";
           }
@@ -169,7 +168,6 @@ function MapView({ detail, setDetail, isQuerying, setIsQuerying, changedValuesOb
 
   let [fetching, setFetching] = useState(false);
 
-  // TODO: allow the code to only fetch regional data on updates?
   useEffect(() => {
     if (isQuerying && !fetching) {
       setFetching(true);

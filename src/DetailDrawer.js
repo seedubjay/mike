@@ -94,7 +94,6 @@ function QuartileStats({ipcPredsForRegion, minCI, maxCI}) {
     if (sum>1) {
       let scale = 1/sum;
       for (let phase of ["P2", "P3", "P4"]){
-        // some ugly handling of results being NaN
         if(ipcPredsForRegion[phase]["mean"]==="NaN"){
           return(<div>
                     <h3 padding={0}>{"Famine Population Prediction"}</h3>
@@ -112,12 +111,6 @@ function QuartileStats({ipcPredsForRegion, minCI, maxCI}) {
     ipcPredsForRegion["normalised"]=true;
   }
 
-    // params: obj is an Object having relevant data about predictions for a particular IPC phase
-    // e.g. {
-        //   "68" : [0.2, 0.3],
-        //   "95" : [0.1, 0.4],
-        //   "mean" : 0.25
-        // },
     return (
         <div style={{width: "100%"}}>
             {[["Phase 2", ipcPredsForRegion["P2"]],
@@ -153,12 +146,6 @@ function QuartileStats({ipcPredsForRegion, minCI, maxCI}) {
     );
 }
 
-  // params: phase2 is an Object having relevant data about predictions for IPC Phase 2
-  // e.g. {
-      //   "68" : [0.2, 0.3],
-      //   "95" : [0.1, 0.4],
-      //   "mean" : 0.25
-      // },
 function LikelihoodStats({ipcPredsForRegion}) {
   const classes = useStyles();
 
@@ -314,7 +301,6 @@ const drawerVariants = {
   }
 
 function DetailDrawer({detail, setDetail, ipcPreds}) {
-
     const classes = useStyles();
 
     return (
