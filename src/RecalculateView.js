@@ -30,10 +30,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function handleClick() {
-
-}
-
 function RecalculateView({ isQuerying, setIsQuerying, region, initReady }) {
   const classes = useStyles();
 
