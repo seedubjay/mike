@@ -97,13 +97,13 @@ function getRegionColour(ipcPreds, regionName) {
 
 }
 
-function RegionBackground({regionName, colour, detail}) {
+function RegionBackground({regionName, colour}) {
   return (
     <motion.path
       d={somaliaRegions[regionName]}
       fill={colour}
-      stroke={(detail !== regionName || detail === "")? "white" : "black"}
-      strokeWidth={detail === regionName ? 7 : 2}
+      stroke="white"
+      strokeWidth={2}
       />
   )
 }
@@ -131,7 +131,7 @@ function RegionHighlight({regionName, detail, setDetail, colour}) {
       d={somaliaRegions[regionName]}
       style={{ x }}
       fill={colour}
-      stroke={detail === regionName ? "white" : "black"}
+      stroke={detail === regionName ? "white" : "grey"}
       strokeWidth={2}
       scale={1}
       opacity={0}
